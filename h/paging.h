@@ -1,5 +1,9 @@
 /* paging.h */
 
+//#ifndef _PAGING_H_
+//#define _PAGING_H_
+
+
 typedef unsigned int	 bsd_t;
 
 /* Structure for a page directory entry */
@@ -44,12 +48,18 @@ typedef struct{
 
 typedef struct{
   int bs_status;			/* MAPPED or UNMAPPED		*/
-  int bs_pid[NPROC];				/* process id using this slot   */
-  int bs_vpno[NPROC];				/* starting virtual page number */
-  int bs_npages;			/* number of pages in the store */
+  int bs_pid[NPROC];                    /* process id using this slot   */
+  int bs_vpno[NPROC];                   /* starting virtual page number */
+  int bs_npages[NPROC];			/* number of pages in the store */
   int bs_sem;				/* semaphore mechanism ?	*/
+  int bs_private;
+  int bs_mapping;
+  // NEW ONE DELETE IF NOT NEEDED
+  int bs_reference_cnt;                   // total process ref this Backing store
+  int bs_max_npages;
 } bs_map_t;
 
+//frame map 
 typedef struct{
   int fr_status;			/* MAPPED or UNMAPPED		*/
   int fr_pid;				/* process id using this frame  */
@@ -57,10 +67,15 @@ typedef struct{
   int fr_refcnt;			/* reference count		*/
   int fr_type;				/* FR_DIR, FR_TBL, FR_PAGE	*/
   int fr_dirty;
+  // for least frequently used 
+  int fr_cnt;
 }fr_map_t;
 
 extern bs_map_t bsm_tab[];
 extern fr_map_t frm_tab[];
+
+/* modified */
+
 /* Prototypes for required API calls */
 SYSCALL xmmap(int, bsd_t, int);
 SYSCALL xunmap(int);
@@ -75,6 +90,7 @@ SYSCALL write_bs(char *, bsd_t, int);
 #define NBPG		4096	/* number of bytes per page	*/
 #define FRAME0		1024	/* zero-th frame		*/
 #define NFRAMES 	1024	/* number of frames		*/
+#define NBSM            16
 
 #define BSM_UNMAPPED	0
 #define BSM_MAPPED	1
@@ -86,8 +102,15 @@ SYSCALL write_bs(char *, bsd_t, int);
 #define FR_TBL		1
 #define FR_DIR		2
 
+
 #define SC 3
-#define FIFO 4
+#define LFU 4
+extern int scAcc[];
+extern int scPointer;
+
 
 #define BACKING_STORE_BASE	0x00800000
-#define BACKING_STORE_UNIT_SIZE 0x00100000
+//as we have total pages = 128...so 512 KB is what each back store require
+#define BACKING_STORE_UNIT_SIZE 0x00080000    
+
+//#endif

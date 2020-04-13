@@ -1,5 +1,4 @@
 /* proc.h - isbadpid */
-
 #ifndef _PROC_H_
 #define _PROC_H_
 
@@ -15,7 +14,6 @@
 
 #define	FDFREE		-1		/* free file descriptor */
 #define PRFREE		'\002'          /* process slot is free         */
-
 
 /* process state constants */
 
@@ -77,6 +75,8 @@ struct	pentry	{
         int     vhpno;                  /* starting pageno for vheap    */
         int     vhpnpages;              /* vheap size                   */
         struct mblock *vmemlist;        /* vheap list              	*/
+        int private_heap;
+     	int bs[16];
 };
 
 
@@ -84,5 +84,8 @@ extern	struct	pentry proctab[];
 extern	int	numproc;		/* currently active processes	*/
 extern	int	nextproc;		/* search point for free slot	*/
 extern	int	currpid;		/* currently executing process	*/
+
+//extern int counterPint;
+
 
 #endif

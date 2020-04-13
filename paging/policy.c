@@ -7,20 +7,25 @@
 
 extern int page_replace_policy;
 /*-------------------------------------------------------------------------
- * srpolicy - set page replace policy 
+ * srpolicy - set page replace policy
  *-------------------------------------------------------------------------
  */
 SYSCALL srpolicy(int policy)
 {
   /* sanity check ! */
 
-  kprintf("To be implemented!\n");
+  //kprintf("POLICITY To be implemented!\n");
 
+  int setPolicy = policy;
+  if (setPolicy != 3) {
+    return SYSERR;
+  }
+  page_replace_policy = setPolicy;
   return OK;
 }
 
 /*-------------------------------------------------------------------------
- * grpolicy - get page replace policy 
+ * grpolicy - get page replace policy
  *-------------------------------------------------------------------------
  */
 SYSCALL grpolicy()

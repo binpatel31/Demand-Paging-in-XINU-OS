@@ -13,9 +13,9 @@
 #include <paging.h>
 
 /*#define DETAIL */
-#define HOLESIZE	(600)	
+#define HOLESIZE	(600)
 #define	HOLESTART	(640 * 1024)
-#define	HOLEEND		((1024 + HOLESIZE) * 1024)  
+#define	HOLEEND		((1024 + HOLESIZE) * 1024)
 /* Extra 600 for bootp loading, and monitor */
 
 extern	int	main();	/* address of user's main prog	*/
@@ -49,6 +49,18 @@ int	console_dev;		/* the console device			*/
 /*  added for the demand paging */
 int page_replace_policy = SC;
 
+/* modified */
+#define SETONE  1
+#define SETZERO 0
+#define TWOTEN  1024
+bs_map_t bsm_tab[SETONE * 16];
+fr_map_t frm_tab[1024];
+int counterPint=SETZERO;
+int lfu_cnt[1024];
+int scAcc[1024];
+int scPointer;
+
+
 /************************************************************************/
 /***				NOTE:				      ***/
 /***								      ***/
@@ -62,6 +74,56 @@ int page_replace_policy = SC;
 /***   not do I/O unless it uses kprintf for polled output.           ***/
 /***								      ***/
 /************************************************************************/
+
+
+/*------------------------------------------------------------------------
+ * demand paging initialize. set up page directory and page tables
+ *------------------------------------------------------------------------
+ */
+
+void init_paging(){
+	SYSCALL pfintr();
+	int index;
+  int indexDos;
+
+  index = SETZERO;
+  indexDos = SETZERO;
+	/* modified */
+	init_bsm();  /* init bsm */
+	init_frm(); /* init frm */
+
+	int frm_num;
+  frm_num = SETZERO;
+
+	pt_t *pt;
+	pd_t *pd;
+
+	for(index = SETZERO;index<(SETONE * 4);index = index + SETONE){
+		get_frm(&frm_num);
+		frm_tab[frm_num].fr_type=1;
+		frm_tab[frm_num].fr_status=1;
+		frm_tab[frm_num].fr_pid=0;
+		pt=(TWOTEN + frm_num)*TWOTEN * 4;
+		for(indexDos=SETZERO;indexDos<TWOTEN;indexDos = indexDos + SETONE){
+			pt->pt_pres=SETONE;
+			pt->pt_write=SETONE;
+			pt->pt_user=SETZERO;
+			pt->pt_pwt=SETZERO;
+			pt->pt_pcd=SETZERO;
+			pt->pt_acc=SETZERO;
+			pt->pt_dirty=SETZERO;
+			pt->pt_mbz=SETZERO;
+			pt->pt_global=SETONE;
+			pt->pt_avail=SETZERO;
+			pt->pt_base=index*TWOTEN + indexDos;
+			pt = pt + SETONE;
+		}
+	}
+	createPageDir(SETONE * SETZERO);
+	pdbr_init(SETONE * SETZERO);/*Set the PDBR register to the page directory for the NULL process.*/
+	set_evec(SETONE * 14,pfintr);		/*Install the page fault interrupt service routine.*/
+	enable_paging();
+}
 
 /*------------------------------------------------------------------------
  *  nulluser  -- initialize system and become the null process (id==0)
@@ -90,25 +152,25 @@ nulluser()				/* babysit CPU when no one is home */
 
 	kprintf("%d bytes real mem\n",
 		(unsigned long) maxaddr+1);
-#ifdef DETAIL	
+#ifdef DETAIL
 	kprintf("    %d", (unsigned long) 0);
 	kprintf(" to %d\n", (unsigned long) (maxaddr) );
-#endif	
+#endif
 
 	kprintf("%d bytes Xinu code\n",
 		(unsigned long) ((unsigned long) &end - (unsigned long) start));
-#ifdef DETAIL	
+#ifdef DETAIL
 	kprintf("    %d", (unsigned long) start);
 	kprintf(" to %d\n", (unsigned long) &end );
 #endif
 
-#ifdef DETAIL	
+#ifdef DETAIL
 	kprintf("%d bytes user stack/heap space\n",
 		(unsigned long) ((unsigned long) maxaddr - (unsigned long) &end));
 	kprintf("    %d", (unsigned long) &end);
 	kprintf(" to %d\n", (unsigned long) maxaddr);
-#endif	
-	
+#endif
+
 	kprintf("clock %sabled\n", clkruns == 1?"en":"dis");
 
 
@@ -134,7 +196,7 @@ sysinit()
 	struct	mblock	*mptr;
 	SYSCALL pfintr();
 
-	
+
 
 	numproc = 0;			/* initialize system variables */
 	nextproc = NPROC-1;
@@ -164,10 +226,12 @@ sysinit()
 		mptr->mlen = (int) truncew((unsigned)maxaddr - (int)&end -
 			NULLSTK);
 	}
-	
+
 
 	for (i=0 ; i<NPROC ; i++)	/* initialize process table */
 		proctab[i].pstate = PRFREE;
+
+
 
 
 #ifdef	MEMMARK
@@ -180,8 +244,9 @@ sysinit()
 
 	mon_init();     /* init monitor */
 
+
 #ifdef NDEVS
-	for (i=0 ; i<NDEVS ; i++ ) {	    
+	for (i=0 ; i<NDEVS ; i++ ) {
 	    init_dev(i);
 	}
 #endif
@@ -210,6 +275,8 @@ sysinit()
 
 	rdytail = 1 + (rdyhead=newqueue());/* initialize ready list */
 
+
+	init_paging();/* demand paging initialize */
 
 	return(OK);
 }
@@ -244,7 +311,7 @@ long sizmem()
 	/* at least now its hacked to return
 	   the right value for the Xinu lab backends (16 MB) */
 
-	return 4096; 
+	return 4096;
 
 	start = ptr = 0;
 	npages = 0;

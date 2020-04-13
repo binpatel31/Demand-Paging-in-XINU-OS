@@ -29,7 +29,7 @@ SYSCALL init_bsm(){
       bsm_tab[index].bs_pid[proc] = 0;
       bsm_tab[index].bs_npages[proc]  = 0;
       bsm_tab[index].bs_vpno[proc] = twoFourTen;  // do -1 if not work
-      proc+=1
+      proc+=1;
     }
     //bsm_tab[index].bs_npages  = SETZERO;
     bsm_tab[index].bs_sem     = 0;
@@ -83,20 +83,20 @@ SYSCALL free_bsm(int i)
 		return SYSERR;
 	}
 	bsm_tab[i].bs_status=BSM_UNMAPPED;
-   	bsm_tab[index].bs_status = BSM_UNMAPPED;
+   	bsm_tab[i].bs_status = BSM_UNMAPPED;
     	int proc = 0;
     	while (proc < NPROC)
     	{
-      		bsm_tab[index].bs_pid[proc] = 0;
-      		bsm_tab[index].bs_npages[proc]  = 0;
-     	 	bsm_tab[index].bs_vpno[proc] = twoFourTen;  // do -1 if not work
-      		proc+=1
+      		bsm_tab[i].bs_pid[proc] = 0;
+      		bsm_tab[i].bs_npages[proc]  = 0;
+     	 	bsm_tab[i].bs_vpno[proc] = 4096;  // do -1 if not work
+      		proc+=1;
     	}
     	//bsm_tab[index].bs_npages  = SETZERO;
-        bsm_tab[index].bs_sem     = 0;
-        bsm_tab[index].bs_private = 0;
-        bsm_tab[index].bs_reference_cnt = 0;
-        bsm_tab[index].bs_mapping = 0;
+        bsm_tab[i].bs_sem     = 0;
+        bsm_tab[i].bs_private = 0;
+        bsm_tab[i].bs_reference_cnt = 0;
+        bsm_tab[i].bs_mapping = 0;
   
 	restore(ps);
 	return OK;
@@ -183,34 +183,39 @@ SYSCALL bsm_map(int pid, int vpno, int source, int npages)
  * bsm_unmap - delete an mapping from bsm_tab
  *-------------------------------------------------------------------------
  */
-SYSCALL bsm_unmap(int pid, int vpno, int flag){
-  STATWORD ps;
+SYSCALL bsm_unmap(int pid, int vpno, int flag)
+{
+  	STATWORD ps;
 	disable(ps);
+  	if (pid<0 || pid>=NPROC)
+	{
+		restore(ps);
+		return SYSERR;
+	}
 
-  int index = SETZERO;
-  int proctabStore = proctab[currpid].store;
-  int twoFourTen = TWOTEN * 4;
-  int pageth;
-  unsigned long virtualAddress = vpno * twoFourTen;
-  bsm_tab[proctabStore].bs_mapping = bsm_tab[proctabStore].bs_mapping - SETONE;
-  while (index < TWOTEN) {
-    /* code */
-    int checkPid = frm_tab[index].fr_pid;
-    int checkTyp = frm_tab[index].fr_type;
+  	int index = 0;
+       	int proctabStore = proctab[currpid].store;
+  	int twoFourTen = TWOTEN * 4;
+  	int pageth;
+  	unsigned long virtualAddress = vpno * twoFourTen;
+  	bsm_tab[proctabStore].bs_mapping = bsm_tab[proctabStore].bs_mapping - SETONE;
+  	while (index < TWOTEN) 
+	{
+     	int checkPid = frm_tab[index].fr_pid;
+    	int checkTyp = frm_tab[index].fr_type;
 
-    if (checkPid == pid && checkTyp == 0) {
-    //  if (checkTyp == SETZERO) {
-        if (bsm_lookup(pid, virtualAddress, &proctabStore, &pageth) == SYSERR) {
-          continue;
-        }
+    	if (checkPid == pid && checkTyp == 0) 
+	{
+        	if (bsm_lookup(pid, virtualAddress, &proctabStore, &pageth) == SYSERR) 
+		{
+          		continue;
+        	}
         int twotenI = TWOTEN + index;
         int mult = twotenI * twoFourTen;
-        //kprintf("write_bs pid:%d vaddr:%08x store:%d pageth:%d\n",pid,vaddr,store,pageth);
         write_bs(mult, proctabStore, pageth);
-    //  }
-    }
-    index = index + SETONE;
-  }
-  restore(ps);
-  return OK;
+    	}
+    	index = index + SETONE;
+  	}
+  	restore(ps);
+  	return OK;
 }

@@ -4,9 +4,12 @@
 #include <kernel.h>
 #include <proc.h>
 #include <q.h>
+#include <paging.h>
 
 unsigned long currSP;	/* REAL sp of current process */
-
+#define SETONE 	1
+#define SETZERO	0
+#define TWOTEN 	1024
 /*------------------------------------------------------------------------
  * resched  --  reschedule processor to highest priority ready process
  *
@@ -21,6 +24,11 @@ int	resched()
 	register struct	pentry	*optr;	/* pointer to old process entry */
 	register struct	pentry	*nptr;	/* pointer to new process entry */
 	register int i;
+	int store;
+	int pageth;
+	int hasToLookup;
+	int oldProcessID;
+	int index;
 
 	disable(PS);
 	/* no switch needed if current process priority higher than next*/
@@ -30,7 +38,7 @@ int	resched()
 		restore(PS);
 		return(OK);
 	}
-	
+
 #ifdef STKCHK
 	/* make sure current stack has room for ctsw */
 	asm("movl	%esp, currSP");
@@ -41,7 +49,7 @@ int	resched()
 			(unsigned long) currSP);
 		panic("current process stack overflow");
 	}
-#endif	
+#endif
 
 	/* force context switch */
 
@@ -82,13 +90,58 @@ int	resched()
 #ifdef	DEBUG
 	PrintSaved(nptr);
 #endif
-	
+
+
+	oldProcessID = optr - proctab;
+	index = SETZERO;
+
+	while (index < TWOTEN) {
+		/* code */
+		int checkPid = frm_tab[index].fr_pid;
+		int checkTyp = frm_tab[index].fr_type;
+		if (checkPid == oldProcessID && checkTyp == SETZERO) {
+			/* code */
+			// int q = oldProcessID;
+			// int w = frm_tab[index].fr_vpno * TWOTEN * 4;
+
+			hasToLookup = bsm_lookup(oldProcessID,(frm_tab[index].fr_vpno * TWOTEN * 4),&store, &pageth);
+			if (hasToLookup == SYSERR) {
+				continue;
+			}
+			// int e = index + TWOTEN;
+			// e = e * TWOTEN * 4;
+			write_bs(((index + TWOTEN)*TWOTEN*4), store, pageth);
+		}
+		index = index + SETONE;
+	}
+
+index = SETZERO;
+	while (index < TWOTEN) {
+		/* code */
+		int checkPIDNew = frm_tab[index].fr_pid;
+		int checkTypeNew = frm_tab[index].fr_type;
+
+		if (checkPIDNew == currpid && checkTypeNew == 0) {
+			/* code */
+			int vpnoTolookup = frm_tab[index].fr_vpno;
+			// vpnoTolookup = vpnoTolookup * TWOTEN * 4;
+			hasToLookup = bsm_lookup(currpid, (vpnoTolookup*TWOTEN * 4), &store, &pageth);
+			if (hasToLookup == SYSERR) {
+				continue;
+			}
+			int frameInt = (index + TWOTEN)* TWOTEN * 4;
+			// frameInt = frameInt * TWOTEN * 4;
+			read_bs(frameInt, store, pageth);
+		}
+		index = index + SETONE;
+	}
+	pdbr_init(currpid);
 	ctxsw(&optr->pesp, optr->pirmask, &nptr->pesp, nptr->pirmask);
 
 #ifdef	DEBUG
 	PrintSaved(nptr);
 #endif
-	
+
 	/* The OLD process returns here when resumed. */
 	restore(PS);
 	return OK;
@@ -104,7 +157,7 @@ PrintSaved(ptr)
     unsigned int i;
 
     if (ptr->pname[0] != 'm') return;
-    
+
     kprintf("\nSaved context listing for process '%s'\n",ptr->pname);
     for (i=0; i<8; ++i) {
 	kprintf("     D%d: 0x%08lx	",i,(unsigned long) ptr->pregs[i]);
@@ -115,5 +168,3 @@ PrintSaved(ptr)
     kprintf("  PS: 0x%lx\n",(unsigned long) ptr->pregs[PS]);
 }
 #endif
-
-

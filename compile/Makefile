@@ -371,6 +371,8 @@ monudp.o: ../mon/monudp.c /usr/include/stdc-predef.h \
  ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
  ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
  ../h/./mon/montftp.h ../h/stdio.h
+bsm_1.o: ../paging/bsm_1.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
 bsm.o: ../paging/bsm.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
 bsm_or.o: ../paging/bsm_or.c /usr/include/stdc-predef.h ../h/conf.h \

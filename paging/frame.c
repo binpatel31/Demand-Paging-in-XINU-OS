@@ -20,15 +20,6 @@ SYSCALL init_frm()
   	disable(ps);
 
   	int index = SETZERO;
-/*typedef struct{
-  int fr_status;			/* MAPPED or UNMAPPED		*
-  int fr_pid;				/* process id using this frame  *
-  int fr_vpno;				/* corresponding virtual page no*
-  int fr_refcnt;			/* reference count		*
-  int fr_type;				/* FR_DIR, FR_TBL, FR_PAGE	*
-  int fr_dirty;
-}fr_map_t;
-*/
   while (index < TWOTEN) {
     /* code */
     frm_tab[index].fr_status  = 0;
@@ -88,6 +79,29 @@ SYSCALL get_frm(int* avail){
     restore(ps);
     return OK;
   }
+  else if(page_replace_policy==LFU)
+  {
+    int fr;
+    int min=0xffffffff;
+    int min_frame=-1;
+    for(fr=0;fr<NFRAMES;++fr)
+    {
+        if(frm_tab[fr].fr_type == FR_PAGE && frm_tab[fr].fr_cnt<min)
+        {
+               	min = frm_tab[fr].fr_cnt;
+                min_frame=fr;
+        }
+	else if(frm_tab[fr].fr_cnt == min && (frm_tab[fr].fr_vpno > frm_tab[min_frame].fr_vpno))
+	{
+		min_frame=fr;
+	}
+    }
+   free_frm(min_frame);
+   *avail = min_frame;
+   restore(ps);
+   return OK;     
+  }
+
   //kprintf("get frm end!\n");
   restore(ps);
   return SYSERR;

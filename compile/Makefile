@@ -375,8 +375,6 @@ bsm_1.o: ../paging/bsm_1.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
 bsm.o: ../paging/bsm.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
-bsm_or.o: ../paging/bsm_or.c /usr/include/stdc-predef.h ../h/conf.h \
- ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
 control_reg.o: ../paging/control_reg.c /usr/include/stdc-predef.h \
  ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
 dump32.o: ../paging/dump32.c /usr/include/stdc-predef.h ../h/conf.h \

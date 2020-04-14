@@ -149,7 +149,7 @@ void createPageDir(int pid) {
     pd_entry[indexDos].pd_write = SETONE;
     int limitDos = SETONE * 4;
     if (indexDos < limitDos) {
-      /* code */
+       /* code */
       int addIs = TWOTEN + indexDos;
       pd_entry[indexDos].pd_base = addIs;
       pd_entry[indexDos].pd_pres = SETONE;

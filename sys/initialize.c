@@ -83,45 +83,45 @@ int scPointer;
 
 void init_paging(){
 	SYSCALL pfintr();
-	int index;
-  int indexDos;
-
-  index = SETZERO;
-  indexDos = SETZERO;
-	/* modified */
+	int i,p;
+	
 	init_bsm();  /* init bsm */
 	init_frm(); /* init frm */
 
 	int frm_num;
-  frm_num = SETZERO;
+  	frm_num = 0;
 
 	pt_t *pt;
 	pd_t *pd;
 
-	for(index = SETZERO;index<(SETONE * 4);index = index + SETONE){
+	for(i=0;i<4;++i)
+	{
 		get_frm(&frm_num);
-		frm_tab[frm_num].fr_type=1;
-		frm_tab[frm_num].fr_status=1;
+		frm_tab[frm_num].fr_type=FR_TBL;
+		frm_tab[frm_num].fr_status=FRM_MAPPED;
 		frm_tab[frm_num].fr_pid=0;
-		pt=(TWOTEN + frm_num)*TWOTEN * 4;
-		for(indexDos=SETZERO;indexDos<TWOTEN;indexDos = indexDos + SETONE){
-			pt->pt_pres=SETONE;
-			pt->pt_write=SETONE;
-			pt->pt_user=SETZERO;
-			pt->pt_pwt=SETZERO;
-			pt->pt_pcd=SETZERO;
-			pt->pt_acc=SETZERO;
-			pt->pt_dirty=SETZERO;
-			pt->pt_mbz=SETZERO;
-			pt->pt_global=SETONE;
-			pt->pt_avail=SETZERO;
-			pt->pt_base=index*TWOTEN + indexDos;
-			pt = pt + SETONE;
+		//loop for first four PT (16MB)
+		pt=(1024 + frm_num)*4096;
+		for(p=0;p<1024;++p)
+		{
+			pt->pt_pres=1;
+			pt->pt_write=1;
+			pt->pt_user=0;
+			pt->pt_pwt=0;
+			pt->pt_pcd=0;
+			pt->pt_acc=0;
+			pt->pt_dirty=0;
+			pt->pt_mbz=0;
+			pt->pt_global=1;
+			pt->pt_avail=0;
+			pt->pt_base=((i*1024)+ p);
+			++pt;
 		}
 	}
-	createPageDir(SETONE * SETZERO);
-	pdbr_init(SETONE * SETZERO);/*Set the PDBR register to the page directory for the NULL process.*/
-	set_evec(SETONE * 14,pfintr);		/*Install the page fault interrupt service routine.*/
+	int nullproc=0;
+	createPageDir(nullproc);
+	pdbr_init(nullproc); 
+	set_evec(14,(u_long)pfintr);		/*Page fault service*/
 	enable_paging();
 }
 

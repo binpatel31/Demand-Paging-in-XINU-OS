@@ -27,7 +27,7 @@ SYSCALL init_bsm(){
     while (proc < NPROC) 
     {    
       bsm_tab[index].bs_pid[proc] = 0;
-      bsm_tab[index].bs_npages[proc]  = 0;
+      bsm_tab[index].bs_npages = 0;
       bsm_tab[index].bs_vpno[proc] = twoFourTen;  // do -1 if not work
       proc+=1;
     }
@@ -88,7 +88,7 @@ SYSCALL free_bsm(int i)
     	while (proc < NPROC)
     	{
       		bsm_tab[i].bs_pid[proc] = 0;
-      		bsm_tab[i].bs_npages[proc]  = 0;
+      		bsm_tab[i].bs_npages  = 0;
      	 	bsm_tab[i].bs_vpno[proc] = 4096;  // do -1 if not work
       		proc+=1;
     	}
@@ -119,7 +119,7 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth)
     		int valid = bsm_tab[index].bs_pid[pid];
     		if (valid==1) 
 		{
-                	int val1 = bsm_tab[index].bs_vpno[pid]+bsm_tab[index].bs_npages[pid];
+                	int val1 = bsm_tab[index].bs_vpno[pid]+bsm_tab[index].bs_npages;
 			int val2 = bsm_tab[index].bs_vpno[pid];
 			if(taddr < val1 && taddr >= val2)
 			{
@@ -161,7 +161,7 @@ SYSCALL bsm_map(int pid, int vpno, int source, int npages)
   //	if (bsm_tab[source].bs_status==BSM_UNMAPPED) 
 //	{
       		bsm_tab[source].bs_status = BSM_MAPPED;
-      		bsm_tab[source].bs_npages[pid] = npages;
+      		bsm_tab[source].bs_npages = npages;
   //	}
   bsm_tab[source].bs_pid[pid] = 1;
   bsm_tab[source].bs_sem      = 0;

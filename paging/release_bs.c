@@ -22,7 +22,7 @@ SYSCALL release_bs(bsd_t bs_id) {
       /* code */
       bsm_tab[index].bs_status = 0;
       bsm_tab[index].bs_sem    = SETZERO;
-      bsm_tab[index].bs_npages[currpid] = SETZERO;
+      bsm_tab[index].bs_npages = SETZERO;
       bsm_tab[index].bs_private= SETZERO;
     }
 

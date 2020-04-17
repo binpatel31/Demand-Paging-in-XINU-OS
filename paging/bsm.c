@@ -28,7 +28,7 @@ SYSCALL init_bsm(){
     {    
       bsm_tab[index].bs_pid[proc] = 0;
       bsm_tab[index].bs_npages = 0;
-      bsm_tab[index].bs_vpno[proc] = twoFourTen;  // do -1 if not work
+      bsm_tab[index].bs_vpno[proc] = 4096;  // do -1 if not work
       proc+=1;
     }
     //bsm_tab[index].bs_npages  = SETZERO;
@@ -193,28 +193,34 @@ SYSCALL bsm_unmap(int pid, int vpno, int flag)
 		return SYSERR;
 	}
 
-  	int index = 0;
-       	int proctabStore = proctab[currpid].store;
-  	int twoFourTen = TWOTEN * 4;
+ // 	int index = 0;
+       	int proctabStore = proctab[pid].store;
+  	
   	int pageth;
-  	unsigned long virtualAddress = vpno * twoFourTen;
-  	bsm_tab[proctabStore].bs_mapping = bsm_tab[proctabStore].bs_mapping - SETONE;
-  	while (index < TWOTEN) 
+  	unsigned long virtualAddress = vpno * 4096;
+  	bsm_tab[proctab[pid].store].bs_mapping = bsm_tab[proctab[pid].store].bs_mapping - 1;
+  	int i;
+	for(i=0;i<1024;++i)
+	//while (index < TWOTEN) 
 	{
-     	int checkPid = frm_tab[index].fr_pid;
-    	int checkTyp = frm_tab[index].fr_type;
-
-    	if (checkPid == pid && checkTyp == 0) 
-	{
-        	if (bsm_lookup(pid, virtualAddress, &proctabStore, &pageth) == SYSERR) 
+     		int checkPid = frm_tab[i].fr_pid;
+    		int checkTyp = frm_tab[i].fr_type;
+		
+		if(frm_tab[i].fr_pid == pid)
+	    	//if (checkPid == pid && checkTyp == 0) 
 		{
-          		continue;
-        	}
-        int twotenI = TWOTEN + index;
-        int mult = twotenI * twoFourTen;
-        write_bs(mult, proctabStore, pageth);
-    	}
-    	index = index + SETONE;
+			if(frm_tab[i].fr_type == FR_PAGE)
+			{
+       	 			if (bsm_lookup(pid, virtualAddress, &proctabStore, &pageth) == SYSERR) 
+				{
+          				continue;
+        			}
+        			//int twotenI = TWOTEN+i;
+        			int mult = (1024+i) * 4096;
+        			write_bs(mult, proctabStore, pageth);
+			}
+    		}
+    		//index = index + SETONE;
   	}
   	restore(ps);
   	return OK;

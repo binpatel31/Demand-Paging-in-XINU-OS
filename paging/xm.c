@@ -19,33 +19,33 @@ SYSCALL xmmap(int virtpage, bsd_t source, int npages)
 
 	if(source<0 || source>=16)
 	{
-                kprintf("2");
+        //        kprintf("2");
                 restore(ps);
                 return SYSERR;		
 	}
         if(npages<1 || npages>128)
         {
-                kprintf("3");
+          //      kprintf("3");
                 restore(ps);
                 return SYSERR;
         }
 
 	if(virtpage<(TWOTEN * 4))
 	{
-                kprintf("4");
+         //       kprintf("4");
   		restore(ps);
 		return SYSERR;
 	}
 
   	if(bsm_tab[source].bs_private==1)
 	{
-    		kprintf("5"); 
+    	//	kprintf("5"); 
   		restore(ps);
 		return SYSERR;
   	}
   	if(npages> bsm_tab[source].bs_npages)
 	{
-		    kprintf("6");  
+	//	    kprintf("6");  
   		restore(ps);
 		return SYSERR;
   	}

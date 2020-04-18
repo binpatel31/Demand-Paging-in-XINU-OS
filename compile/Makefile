@@ -398,6 +398,8 @@ vcreate.o: ../paging/vcreate.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/sem.h ../h/io.h ../h/paging.h
 vfreemem.o: ../paging/vfreemem.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
+vgetmem_1.o: ../paging/vgetmem_1.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
 vgetmem.o: ../paging/vgetmem.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
 write_bs.o: ../paging/write_bs.c /usr/include/stdc-predef.h ../h/conf.h \

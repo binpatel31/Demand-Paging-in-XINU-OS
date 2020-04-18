@@ -194,30 +194,32 @@ SYSCALL bsm_unmap(int pid, int vpno, int flag)
 	}
 
  // 	int index = 0;
-       	int proctabStore = proctab[pid].store;
+       	int bs_no = proctab[pid].store;
   	
   	int pageth;
-  	unsigned long virtualAddress = vpno * 4096;
+  	//unsigned long virtualAddress = vpno * 4096;
   	bsm_tab[proctab[pid].store].bs_mapping = bsm_tab[proctab[pid].store].bs_mapping - 1;
   	int i;
+	unsigned long virt_addr = vpno*4096;
 	for(i=0;i<1024;++i)
 	//while (index < TWOTEN) 
 	{
-     		int checkPid = frm_tab[i].fr_pid;
-    		int checkTyp = frm_tab[i].fr_type;
+     	//	int checkPid = frm_tab[i].fr_pid;
+    	//	int checkTyp = frm_tab[i].fr_type;
 		
 		if(frm_tab[i].fr_pid == pid)
 	    	//if (checkPid == pid && checkTyp == 0) 
 		{
 			if(frm_tab[i].fr_type == FR_PAGE)
 			{
-       	 			if (bsm_lookup(pid, virtualAddress, &proctabStore, &pageth) == SYSERR) 
+       	 			if (bsm_lookup(pid, virt_addr, &bs_no, &pageth) != SYSERR) 
 				{
-          				continue;
+          				//continue;
+          				write_bs(((1024+i) * 4096), bs_no, pageth);
         			}
         			//int twotenI = TWOTEN+i;
-        			int mult = (1024+i) * 4096;
-        			write_bs(mult, proctabStore, pageth);
+        			//int mult = (1024+i) * 4096;
+        			//write_bs(((1024+i) * 4096), bs_no, pageth);
 			}
     		}
     		//index = index + SETONE;

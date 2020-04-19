@@ -5,10 +5,6 @@
 #include <mem.h>
 #include <proc.h>
 
-#define SETZERO 0
-#define SETONE  1
-#define TWOTEN  1024
-
 extern struct pentry proctab[];
 /*------------------------------------------------------------------------
  *  vfreemem  --  free a virtual memory block, returning it to vmemlist
@@ -18,63 +14,77 @@ SYSCALL	vfreemem(block, size)
 	struct	mblock	*block;
 	unsigned size;
 {
-	//kprintf("VFREEMEM To be implemented!\n");
+
 	STATWORD ps;
-	struct mblock *index;
+	struct mblock *a,*b;
 	unsigned top;
-	struct mblock *indexDos;
-	if (size == SETZERO) {
-		/* code */
-		return -SETONE;
+
+	if (size == 0) 
+	{
+		return SYSERR;
 	}
 
-	size = (unsigned) roundmb(size);
 	disable(ps);
 
+	
+	int c,h;
 	int list = &proctab[currpid].vmemlist;
-	indexDos = list;
+	b = list;
 
-	index = indexDos->mnext;
-
-	while (index != (struct mblock *)NULL && index< block) {
-		indexDos = index;
-		index = index->mnext;
+	for(a=b->mnext; a != (struct mblock *)NULL && a< block; a=a->mnext)
+	{
+		b = a;
 	}
 
 
-		int c = indexDos->mlen;
-		int h = c + (unsigned)indexDos;
-		top = h;
-		int e = &proctab[currpid].vmemlist;
-		int at = size + (unsigned)block;
-		if ((top > (unsigned)block && indexDos != e) || (index != NULL && (at > (unsigned)index ) )) {
-			/* code */
-			restore(ps);
-			return -SETONE;
+	int addr_e = &proctab[currpid].vmemlist;
+	int at = (unsigned) roundmb(size) + (unsigned)block;
+	if((b->mlen + (unsigned)b) > (unsigned)block)
+    	{
+		if (b != &proctab[currpid].vmemlist)
+		{
+                	restore(ps);
+                	return SYSERR;
 		}
-		int ed = (unsigned) block;
-
-		if (indexDos != &memlist && top == ed) {
-			/* code */
-			int add = indexDos->mlen;
-			indexDos->mlen =  add + size;
-		} else {
-			int s = size;
-			block->mlen = s;
-			block->mnext = index;
-			indexDos->mnext = block;
-			indexDos = block;
+    	}
+	if(a != NULL && (at > (unsigned)a ))
+	{
+		restore(ps);
+		return SYSERR;
+	}
+    	h = b->mlen + (unsigned)b;
+	int ed = (unsigned) block;
+	top=h;
+	
+	int temp = b->mlen;
+	if (b != &memlist) 
+	{
+		if((b->mlen + (unsigned)b) == ed)
+		{
+			int add = b->mlen;
+			b->mlen =  add + (unsigned) roundmb(size);
 		}
-		int a00 = indexDos->mlen;
-		int a01 = (unsigned)(indexDos);
-		int a02 = a00 + a01;
-		int b00 = (unsigned)index;
-		if (a02 == b00) {
-			/* code */
-			int addDos = indexDos->mlen;
-			indexDos->mlen = addDos + index->mlen;
-			indexDos->mnext = index->mnext;
-		}
+	} 
+	else 
+	{
+		//int s = size;
+		block->mlen = (unsigned) roundmb(size);
+		
+		temp = temp+(1024);
+		block->mnext = a;
+		b->mnext = block;
+		b = block;
+	}
+	int val1 = b->mlen + (unsigned)(b);
+	int val2 = (unsigned)a;
+	
+	if (val1 == val2 ) 
+	{
+		int addDos = b->mlen;
+		temp = temp+1024;
+		b->mlen = addDos + a->mlen;
+		b->mnext = a->mnext;
+	}
 
 	restore(ps);
 	return OK;

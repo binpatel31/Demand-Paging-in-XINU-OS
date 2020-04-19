@@ -188,7 +188,7 @@ void enable_paging(){
   write_cr0(temp);
 }
 
-
+/*
 void pdbr_init (int pid) {
   STATWORD ps;
   disable(ps);
@@ -196,3 +196,4 @@ void pdbr_init (int pid) {
   write_cr3(pdbr);
   restore(ps);
 }
+*/

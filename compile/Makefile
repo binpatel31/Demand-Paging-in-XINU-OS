@@ -48,7 +48,7 @@ SYS =	blkcmp.c	blkequ.c	main.c		stacktrace.c	\
 	signal.c	signaln.c	sleep.c		sleep10.c	\
 	sleep100.c	sleep1000.c	sreset.c	suspend.c	\
 	unsleep.c	userret.c	wait.c		wakeup.c	\
-	write.c		xdone.c		pci.c           shutdown.c
+	write.c		xdone.c		pci.c           shutdown.c	
 
 TTY =	ttyalloc.c	ttycntl.c	ttygetc.c	ttyiin.c	\
 	ttyinit.c	ttynew.c	ttyopen.c	ttyputc.c	\
@@ -57,7 +57,7 @@ TTY =	ttyalloc.c	ttycntl.c	ttygetc.c	ttyiin.c	\
 PG  =   get_bs.c        release_bs.c    read_bs.c       write_bs.c      \
         control_reg.c   bsm.c           policy.c        \
         frame.c         pfint.c         dump32.c        vcreate.c       \
-        xm.c            vgetmem.c       vfreemem.c
+        xm.c            vgetmem.c       vfreemem.c	pdbr_init.c
 
 SRC = ${COM} ${TTY} ${MON} ${SYS}
 
@@ -375,6 +375,8 @@ bsm_1.o: ../paging/bsm_1.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
 bsm.o: ../paging/bsm.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
+bsm_or.o: ../paging/bsm_or.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
 control_reg.o: ../paging/control_reg.c /usr/include/stdc-predef.h \
  ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
 dump32.o: ../paging/dump32.c /usr/include/stdc-predef.h ../h/conf.h \
@@ -383,6 +385,8 @@ frame.o: ../paging/frame.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
 get_bs.o: ../paging/get_bs.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
+pdbr_init.o: ../paging/pdbr_init.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
 pfint.o: ../paging/pfint.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
 policy.o: ../paging/policy.c /usr/include/stdc-predef.h ../h/conf.h \
@@ -396,6 +400,8 @@ release_bs.o: ../paging/release_bs.c /usr/include/stdc-predef.h \
 vcreate.o: ../paging/vcreate.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/i386.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
  ../h/sem.h ../h/io.h ../h/paging.h
+vfreemem_1.o: ../paging/vfreemem_1.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
 vfreemem.o: ../paging/vfreemem.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
 vgetmem_1.o: ../paging/vgetmem_1.c /usr/include/stdc-predef.h ../h/conf.h \
@@ -593,6 +599,419 @@ ttyread.o: ../tty/ttyread.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h ../h/stdio.h
 ttywrite.o: ../tty/ttywrite.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h
+comcntl.o: ../csc501-lab3/com/comcntl.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h
+comgetc.o: ../csc501-lab3/com/comgetc.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/io.h \
+ ../h/stdio.h
+comiin.o: ../csc501-lab3/com/comiin.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h \
+ ../h/com.h
+cominit.o: ../csc501-lab3/com/cominit.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h \
+ ../h/com.h ../h/stdio.h
+cominput.o: ../csc501-lab3/com/cominput.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h \
+ ../h/io.h ../h/stdio.h
+comintr.o: ../csc501-lab3/com/comintr.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h \
+ ../h/com.h ../h/stdio.h
+comoutput.o: ../csc501-lab3/com/comoutput.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/tty.h ../h/com.h ../h/stdio.h
+comread.o: ../csc501-lab3/com/comread.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/io.h
+lex.yy.o: ../csc501-lab3/config/lex.yy.c /usr/include/stdc-predef.h \
+ ../h/stdio.h /usr/include/string.h /usr/include/features.h \
+ /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h \
+ /usr/include/gnu/stubs.h /usr/include/gnu/stubs-64.h \
+ /usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stddef.h \
+ /usr/include/xlocale.h /usr/include/errno.h /usr/include/bits/errno.h \
+ /usr/include/linux/errno.h /usr/include/asm/errno.h \
+ /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
+ /usr/include/stdlib.h /usr/include/bits/waitflags.h \
+ /usr/include/bits/waitstatus.h /usr/include/endian.h \
+ /usr/include/bits/endian.h /usr/include/bits/byteswap.h \
+ /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+ /usr/include/bits/byteswap-16.h /usr/include/sys/types.h \
+ /usr/include/time.h /usr/include/sys/select.h /usr/include/bits/select.h \
+ /usr/include/bits/sigset.h /usr/include/bits/time.h \
+ /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h \
+ /usr/include/alloca.h /usr/include/bits/stdlib-float.h \
+ /usr/include/unistd.h /usr/include/bits/posix_opt.h \
+ /usr/include/bits/environments.h /usr/include/bits/confname.h \
+ /usr/include/getopt.h
+y.tab.o: ../csc501-lab3/config/y.tab.c /usr/include/stdc-predef.h \
+ /usr/include/stdlib.h /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+ /usr/include/gnu/stubs-64.h \
+ /usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stddef.h \
+ /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h \
+ /usr/include/endian.h /usr/include/bits/endian.h \
+ /usr/include/bits/byteswap.h /usr/include/bits/types.h \
+ /usr/include/bits/typesizes.h /usr/include/bits/byteswap-16.h \
+ /usr/include/sys/types.h /usr/include/time.h /usr/include/sys/select.h \
+ /usr/include/bits/select.h /usr/include/bits/sigset.h \
+ /usr/include/bits/time.h /usr/include/sys/sysmacros.h \
+ /usr/include/bits/pthreadtypes.h /usr/include/alloca.h \
+ /usr/include/bits/stdlib-float.h ../h/stdio.h \
+ ../csc501-lab3/config/lex.yy.c /usr/include/string.h \
+ /usr/include/xlocale.h /usr/include/errno.h /usr/include/bits/errno.h \
+ /usr/include/linux/errno.h /usr/include/asm/errno.h \
+ /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
+ /usr/include/unistd.h /usr/include/bits/posix_opt.h \
+ /usr/include/bits/environments.h /usr/include/bits/confname.h \
+ /usr/include/getopt.h
+ethcmd.o: ../csc501-lab3/mon/ethcmd.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/moni386.h ../h/./mon/moneepro.h ../h/stdio.h
+ethdemux.o: ../csc501-lab3/mon/ethdemux.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
+ ../h/./mon/moneepro.h ../h/stdio.h
+ethinit.o: ../csc501-lab3/mon/ethinit.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
+ ../h/./mon/moneepro.h ../h/./mon/mon3com.h ../h/./mon/monintel.h \
+ ../h/./mon/monpci.h ../h/stdio.h
+ethintr.o: ../csc501-lab3/mon/ethintr.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
+ ../h/./mon/moneepro.h ../h/stdio.h
+ethrom.o: ../csc501-lab3/mon/ethrom.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
+ ../h/./mon/moneepro.h ../h/stdio.h
+ethwrite.o: ../csc501-lab3/mon/ethwrite.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
+ ../h/stdio.h
+ethwstrt.o: ../csc501-lab3/mon/ethwstrt.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
+ ../h/./mon/moneepro.h ../h/stdio.h
+mon3com.o: ../csc501-lab3/mon/mon3com.c /usr/include/stdc-predef.h \
+ ../h/mon/moni386.h ../h/mon/monnetwork.h ../h/./mon/monsystypes.h \
+ ../h/./mon/monconf.h ../h/./mon/monip.h ../h/./mon/monether.h \
+ ../h/./mon/monudp.h ../h/./mon/monbootp.h ../h/./mon/monarp.h \
+ ../h/./mon/monnetif.h ../h/mon/mon3com.h ../h/mon/monpci.h \
+ ../h/mon/monitor.h ../h/./mon/moncom.h ../h/./mon/monnetwork.h \
+ ../h/./mon/monitor.h ../h/./mon/moni386.h ../h/stdio.h
+monarp.o: ../csc501-lab3/mon/monarp.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
+ ../h/stdio.h
+monboot.o: ../csc501-lab3/mon/monboot.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
+ ../h/stdio.h
+monbootp.o: ../csc501-lab3/mon/monbootp.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
+ ../h/stdio.h
+mongpq.o: ../csc501-lab3/mon/mongpq.c /usr/include/stdc-predef.h \
+ ../h/./mon/monconf.h ../h/./mon/monitor.h ../h/./mon/moncom.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monip.h \
+ ../h/./mon/monether.h ../h/./mon/monudp.h ../h/./mon/monbootp.h \
+ ../h/./mon/monarp.h ../h/./mon/monnetif.h ../h/./mon/moni386.h \
+ ../h/stdio.h
+monip.o: ../csc501-lab3/mon/monip.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
+ ../h/stdio.h
+monitor.o: ../csc501-lab3/mon/monitor.c /usr/include/stdc-predef.h \
+ ../h/./mon/moncom.h ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h \
+ ../h/./mon/monconf.h ../h/./mon/monip.h ../h/./mon/monether.h \
+ ../h/./mon/monudp.h ../h/./mon/monbootp.h ../h/./mon/monarp.h \
+ ../h/./mon/monnetif.h ../h/./mon/monitor.h ../h/./mon/moni386.h \
+ ../h/bufpool.h ../h/mark.h ../h/stdio.h
+monnet.o: ../csc501-lab3/mon/monnet.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/moni386.h ../h/./mon/monitor.h ../h/./mon/moncom.h \
+ ../h/bufpool.h ../h/mark.h ../h/stdio.h
+monpci.o: ../csc501-lab3/mon/monpci.c /usr/include/stdc-predef.h \
+ ../h/mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/mon/mon3com.h ../h/mon/monpci.h ../h/mon/monitor.h \
+ ../h/./mon/moncom.h ../h/./mon/monnetwork.h ../h/./mon/monitor.h \
+ ../h/./mon/moni386.h ../h/stdio.h
+montftp.o: ../csc501-lab3/mon/montftp.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
+ ../h/./mon/montftp.h ../h/stdio.h
+montimer.o: ../csc501-lab3/mon/montimer.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
+ ../h/stdio.h
+monudp.o: ../csc501-lab3/mon/monudp.c /usr/include/stdc-predef.h \
+ ../h/./mon/monnetwork.h ../h/./mon/monsystypes.h ../h/./mon/monconf.h \
+ ../h/./mon/monip.h ../h/./mon/monether.h ../h/./mon/monudp.h \
+ ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
+ ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
+ ../h/./mon/montftp.h ../h/stdio.h
+bsm.o: ../csc501-lab3/paging/bsm.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
+control_reg.o: ../csc501-lab3/paging/control_reg.c \
+ /usr/include/stdc-predef.h ../h/conf.h ../h/kernel.h ../h/systypes.h \
+ ../h/mem.h
+dump32.o: ../csc501-lab3/paging/dump32.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h
+frame.o: ../csc501-lab3/paging/frame.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/paging.h
+get_bs.o: ../csc501-lab3/paging/get_bs.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/paging.h
+pfint.o: ../csc501-lab3/paging/pfint.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h
+policy.o: ../csc501-lab3/paging/policy.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h
+read_bs.o: ../csc501-lab3/paging/read_bs.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/mark.h \
+ ../h/bufpool.h ../h/proc.h ../h/paging.h
+release_bs.o: ../csc501-lab3/paging/release_bs.c \
+ /usr/include/stdc-predef.h ../h/conf.h ../h/kernel.h ../h/systypes.h \
+ ../h/mem.h ../h/proc.h ../h/paging.h
+vcreate.o: ../csc501-lab3/paging/vcreate.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/i386.h ../h/kernel.h ../h/systypes.h ../h/mem.h \
+ ../h/proc.h ../h/sem.h ../h/io.h ../h/paging.h
+vfreemem.o: ../csc501-lab3/paging/vfreemem.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
+vgetmem.o: ../csc501-lab3/paging/vgetmem.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/paging.h
+write_bs.o: ../csc501-lab3/paging/write_bs.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/mark.h ../h/bufpool.h ../h/paging.h
+xm.o: ../csc501-lab3/paging/xm.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
+blkcmp.o: ../csc501-lab3/sys/blkcmp.c /usr/include/stdc-predef.h
+blkequ.o: ../csc501-lab3/sys/blkequ.c /usr/include/stdc-predef.h \
+ ../h/kernel.h ../h/systypes.h ../h/conf.h ../h/mem.h
+chprio.o: ../csc501-lab3/sys/chprio.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
+clkinit.o: ../csc501-lab3/sys/clkinit.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/sleep.h \
+ ../h/i386.h ../h/stdio.h ../h/q.h
+close.o: ../csc501-lab3/sys/close.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/io.h
+conf.o: ../csc501-lab3/sys/conf.c /usr/include/stdc-predef.h ../h/conf.h
+control.o: ../csc501-lab3/sys/control.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/io.h
+create.o: ../csc501-lab3/sys/create.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/i386.h ../h/kernel.h ../h/systypes.h ../h/mem.h \
+ ../h/proc.h ../h/sem.h ../h/io.h ../h/paging.h
+evec.o: ../csc501-lab3/sys/evec.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/i386.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/sem.h ../h/tty.h ../h/q.h ../h/io.h ../h/stdio.h
+freebuf.o: ../csc501-lab3/sys/freebuf.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/mark.h \
+ ../h/bufpool.h ../h/stdio.h
+freemem.o: ../csc501-lab3/sys/freemem.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/stdio.h
+getbuf.o: ../csc501-lab3/sys/getbuf.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/mark.h \
+ ../h/bufpool.h ../h/stdio.h
+getc.o: ../csc501-lab3/sys/getc.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/io.h
+getitem.o: ../csc501-lab3/sys/getitem.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/q.h
+getmem.o: ../csc501-lab3/sys/getmem.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/stdio.h
+getpid.o: ../csc501-lab3/sys/getpid.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
+getprio.o: ../csc501-lab3/sys/getprio.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/stdio.h
+getstk.o: ../csc501-lab3/sys/getstk.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/stdio.h
+gettime.o: ../csc501-lab3/sys/gettime.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/date.h
+gpq.o: ../csc501-lab3/sys/gpq.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/q.h ../h/stdio.h
+i386.o: ../csc501-lab3/sys/i386.c /usr/include/stdc-predef.h ../h/icu.h \
+ ../h/i386.h ../h/kernel.h ../h/systypes.h ../h/conf.h ../h/mem.h
+init.o: ../csc501-lab3/sys/init.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/io.h
+initialize.o: ../csc501-lab3/sys/initialize.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/i386.h ../h/kernel.h ../h/systypes.h ../h/mem.h \
+ ../h/proc.h ../h/sem.h ../h/sleep.h ../h/tty.h ../h/q.h ../h/io.h \
+ ../h/paging.h
+insert.o: ../csc501-lab3/sys/insert.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/q.h
+insertd.o: ../csc501-lab3/sys/insertd.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/q.h
+ioerr.o: ../csc501-lab3/sys/ioerr.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h
+ionull.o: ../csc501-lab3/sys/ionull.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h
+kill.o: ../csc501-lab3/sys/kill.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/sem.h \
+ ../h/io.h ../h/q.h ../h/stdio.h
+kprintf.o: ../csc501-lab3/sys/kprintf.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h
+kputc.o: ../csc501-lab3/sys/kputc.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h
+main.o: ../csc501-lab3/sys/main.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/stdio.h
+mark.o: ../csc501-lab3/sys/mark.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/mark.h
+mkpool.o: ../csc501-lab3/sys/mkpool.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/mark.h \
+ ../h/bufpool.h ../h/stdio.h
+newqueue.o: ../csc501-lab3/sys/newqueue.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/q.h
+open.o: ../csc501-lab3/sys/open.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/io.h
+panic.o: ../csc501-lab3/sys/panic.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/stdio.h
+pci.o: ../csc501-lab3/sys/pci.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/pci.h ../h/stdio.h
+poolinit.o: ../csc501-lab3/sys/poolinit.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/mark.h \
+ ../h/bufpool.h ../h/stdio.h
+putc.o: ../csc501-lab3/sys/putc.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/io.h
+queue.o: ../csc501-lab3/sys/queue.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/q.h
+read.o: ../csc501-lab3/sys/read.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/io.h
+ready.o: ../csc501-lab3/sys/ready.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h
+receive.o: ../csc501-lab3/sys/receive.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/stdio.h
+recvclr.o: ../csc501-lab3/sys/recvclr.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/stdio.h
+recvtim.o: ../csc501-lab3/sys/recvtim.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/sleep.h ../h/stdio.h
+resched.o: ../csc501-lab3/sys/resched.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h
+resume.o: ../csc501-lab3/sys/resume.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/stdio.h
+scount.o: ../csc501-lab3/sys/scount.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/sem.h
+screate.o: ../csc501-lab3/sys/screate.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/sem.h ../h/stdio.h
+sdelete.o: ../csc501-lab3/sys/sdelete.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/sem.h ../h/stdio.h
+send.o: ../csc501-lab3/sys/send.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/stdio.h
+setdev.o: ../csc501-lab3/sys/setdev.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
+setnok.o: ../csc501-lab3/sys/setnok.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/stdio.h
+shutdown.o: ../csc501-lab3/sys/shutdown.c /usr/include/stdc-predef.h \
+ ../h/kernel.h ../h/systypes.h ../h/conf.h ../h/mem.h ../h/stdio.h
+signal.o: ../csc501-lab3/sys/signal.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/sem.h ../h/stdio.h
+signaln.o: ../csc501-lab3/sys/signaln.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/sem.h ../h/stdio.h
+sleep1000.o: ../csc501-lab3/sys/sleep1000.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/sleep.h ../h/stdio.h
+sleep100.o: ../csc501-lab3/sys/sleep100.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/sleep.h ../h/stdio.h
+sleep10.o: ../csc501-lab3/sys/sleep10.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/sleep.h ../h/stdio.h
+sleep.o: ../csc501-lab3/sys/sleep.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/sleep.h ../h/stdio.h
+sreset.o: ../csc501-lab3/sys/sreset.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/sem.h ../h/stdio.h
+ssclock.o: ../csc501-lab3/sys/ssclock.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/sleep.h
+stacktrace.o: ../csc501-lab3/sys/stacktrace.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/stdio.h
+suspend.o: ../csc501-lab3/sys/suspend.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/stdio.h
+unsleep.o: ../csc501-lab3/sys/unsleep.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/sleep.h ../h/stdio.h
+userret.o: ../csc501-lab3/sys/userret.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h
+wait.o: ../csc501-lab3/sys/wait.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/q.h ../h/sem.h \
+ ../h/stdio.h
+wakeup.o: ../csc501-lab3/sys/wakeup.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/q.h ../h/sleep.h
+write.o: ../csc501-lab3/sys/write.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/io.h
+xdone.o: ../csc501-lab3/sys/xdone.c /usr/include/stdc-predef.h \
+ ../h/kernel.h ../h/systypes.h ../h/conf.h ../h/mem.h ../h/stdio.h
+ttyalloc.o: ../csc501-lab3/tty/ttyalloc.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h \
+ ../h/stdio.h
+ttycntl.o: ../csc501-lab3/tty/ttycntl.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h \
+ ../h/stdio.h
+ttygetc.o: ../csc501-lab3/tty/ttygetc.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h
+ttyiin.o: ../csc501-lab3/tty/ttyiin.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h
+ttyinit.o: ../csc501-lab3/tty/ttyinit.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h
+ttynew.o: ../csc501-lab3/tty/ttynew.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h
+ttyoin.o: ../csc501-lab3/tty/ttyoin.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h \
+ ../h/stdio.h
+ttyopen.o: ../csc501-lab3/tty/ttyopen.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h
+ttyputc.o: ../csc501-lab3/tty/ttyputc.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h
+ttyread.o: ../csc501-lab3/tty/ttyread.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h \
+ ../h/stdio.h
+ttywrite.o: ../csc501-lab3/tty/ttywrite.c /usr/include/stdc-predef.h \
+ ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/tty.h
 abs.o: ../lib/libxc/abs.c /usr/include/stdc-predef.h
 atof.o: ../lib/libxc/atof.c /usr/include/stdc-predef.h ../h/ctype.h
 atoi.o: ../lib/libxc/atoi.c /usr/include/stdc-predef.h

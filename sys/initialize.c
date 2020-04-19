@@ -19,7 +19,7 @@
 /* Extra 600 for bootp loading, and monitor */
 
 extern	int	main();	/* address of user's main prog	*/
-
+extern void pdbr_init(int);
 extern	int	start();
 
 LOCAL		sysinit();

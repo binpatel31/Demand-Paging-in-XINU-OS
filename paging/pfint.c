@@ -7,45 +7,42 @@
 
 extern int page_replace_policy;
 
-#define SETONE  1
-#define SETZERO 0
-#define TWOTEN  1024
+int pageCreate() 
+{
+	  STATWORD ps;
+	  disable(ps);
+	  
+	  int frameNumber;
+	  
 
-int pageCreate() {
-  STATWORD ps;
-  disable(ps);
-  int index = SETZERO;
-  //kprintf("PFINT To be implemented!\n");
-  int frameNumber;
-  unsigned int frameAddress;
+	  get_frm(&frameNumber);
+//	  int twoFourTen = 1024 * 4;
 
-  get_frm(&frameNumber);
-  int twoFourTen = TWOTEN * 4;
+	  //frameAddress = ;
+	  unsigned int frameAddress;
+	  frameAddress = (1024 + frameNumber) * 4096;
 
-  frameAddress = TWOTEN + frameNumber;
-  frameAddress = frameAddress * twoFourTen;
-
-  //pt_t *pageTable;
-  pt_t *pageTable = (pt_t *)frameAddress;
-
-  while (index < TWOTEN) {
-    /* code */
-    pageTable[index].pt_pres  = SETZERO;
-    pageTable[index].pt_write = SETZERO;
-    pageTable[index].pt_user  = SETZERO;
-    pageTable[index].pt_pwt   = SETZERO;
-    pageTable[index].pt_pcd   = SETZERO;
-    pageTable[index].pt_acc   = SETZERO;
-    pageTable[index].pt_dirty = SETZERO;
-    pageTable[index].pt_mbz   = SETZERO;
-    pageTable[index].pt_global= SETZERO;
-    pageTable[index].pt_avail = SETZERO;
-    pageTable[index].pt_base  = SETZERO;
-
-    index = index + SETONE;
-  }
-  restore(ps);
-  return frameNumber;
+	  pt_t *pageTable = (pt_t *)frameAddress;
+	  int index;// = 0;
+	  for(index=0;index<1024;index++)
+	  //while (index < 1024) 
+	  {
+			pageTable[index].pt_pres  = 0;
+			pageTable[index].pt_write = 0;
+			pageTable[index].pt_user  = 0;
+			pageTable[index].pt_pwt   = 0;
+			pageTable[index].pt_pcd   = 0;
+			pageTable[index].pt_acc   = 0;
+			pageTable[index].pt_dirty = 0;
+			pageTable[index].pt_mbz   = 0;
+			pageTable[index].pt_global= 0;
+			pageTable[index].pt_avail = 0;
+			pageTable[index].pt_base  = 0;
+			
+			//index = index + 1;
+	  }
+	  restore(ps);
+	  return frameNumber;
 }
 /*-------------------------------------------------------------------------
  * pfint - paging fault ISR
@@ -53,110 +50,96 @@ int pageCreate() {
  */
 SYSCALL pfint()
 {
-  //counterPint = counterPint + SETONE;
+	  STATWORD ps;
+	  disable(ps);
 
-  STATWORD ps;
-  disable(ps);
+	  
+	  unsigned long pdbr,tmp;
+	  
+	  unsigned int pg, pt, pd;
 
-  int newPageTable, newFrame, store, pageth;
+	  
+	  
+	  pt_t *pageTable;
+	  
+	 //  unsigned long tmp_read;
+	 // tmp_read = read_cr2();
+	  unsigned long virtualAddress;
+	  virtualAddress = read_cr2();   //tmp_read;
 
+	  virt_addr_t *virt_addr;
+	  virt_addr = (virt_addr_t *)&virtualAddress;
+	  pg = virt_addr->pg_offset;
+	  int sz = sizeof(pd_t);
+	  pt = virt_addr->pt_offset;
+	  pd = virt_addr->pd_offset;
+	  pdbr = proctab[currpid].pdbr;
 
-  unsigned long virtualAddress, pdbr,tempVar,tmp;
-  virt_addr_t *virt_addr;
-  unsigned int pg, pt, pd;
+	  //int a = sizeof(pd_t);
+	  //int b = pd * a;
+	  //int add = pdbr + b;
+	  pd_t *pd_entry;
+	  pd_entry = pdbr + (virt_addr->pd_offset * sizeof(pd_t) );
 
-  pd_t *pd_entry;
-  pt_t *pt_entry;
-  pt_t *pageTable;
-//SEE IF THIS WORKS
-/*  STATWORD ps4;
+	  //int checkPresVal = pd_entry->pd_pres;
+	  int new_PT; 
+	  if (pd_entry->pd_pres == 0)
+	  {
+		    new_PT = pageCreate();
+			pd_entry->pd_acc    = 0;
+			pd_entry->pd_mbz    = 0;
+			pd_entry->pd_fmb    = 0;
+			pd_entry->pd_global = 0;
+			pd_entry->pd_avail  = 0;
+			pd_entry->pd_pres   = 1;
+			pd_entry->pd_write  = 1;
+			pd_entry->pd_user   = 0;
+			pd_entry->pd_pwt    = 0;
+			pd_entry->pd_pcd    = 0;
 
-  disable(ps4);
-  asm("pushl %eax");
-  asm("movl %cr2, %eax");
-  asm("movl %eax, tmp");
-  asm("popl %eax");*/
-  tempVar = read_cr2();
-  //restore(ps4);
-  virtualAddress = tempVar;
+			
+		//	int base = 1024 + new_PT;
+			pd_entry->pd_base = 1024 + new_PT;
 
+			frm_tab[new_PT].fr_status = FRM_MAPPED;
+			frm_tab[new_PT].fr_type   = FR_TBL;
+			int base = 1024 + new_PT;
+			frm_tab[new_PT].fr_pid    = currpid;
+     }
 
-virt_addr = (virt_addr_t *)&virtualAddress;
-  pg = virt_addr->pg_offset;
-  pt = virt_addr->pt_offset;
-  pd = virt_addr->pd_offset;
-  pdbr = proctab[currpid].pdbr;
-
-  int a = sizeof(pd_t);
-  int b = pd * a;
-  int add = pdbr + b;
-  pd_entry = add;
-
-  int checkPresVal = pd_entry->pd_pres;
-
-  if (checkPresVal == SETZERO){
-
-
-
-    pd_entry->pd_pres   = SETONE;
-    pd_entry->pd_write  = SETONE;
-    pd_entry->pd_user   = SETZERO;
-    pd_entry->pd_pwt    = SETZERO;
-    pd_entry->pd_pcd    = SETZERO;
-    pd_entry->pd_acc    = SETZERO;
-    pd_entry->pd_mbz    = SETZERO;
-    pd_entry->pd_fmb    = SETZERO;
-    pd_entry->pd_global = SETZERO;
-    pd_entry->pd_avail  = SETZERO;
-    newPageTable = pageCreate();
-    int base = TWOTEN + newPageTable;
-    pd_entry->pd_base = base;
-
-    frm_tab[newPageTable].fr_status = 1;
-    frm_tab[newPageTable].fr_type   = 1;
-    frm_tab[newPageTable].fr_pid    = currpid;
-    }
-
-    int q = sizeof(pt_t);
-    int multTwo = pt * q;
-    int twoFourTenTwo = TWOTEN * 4;
-    int w = pd_entry->pd_base * twoFourTenTwo;
-    //int multThree = w * twoFourTenTwo;
-    int addTwoTwo =  multTwo + w;
+//    int q = sizeof(pt_t);
+ //   int multTwo = pt * sizeof(pt_t);
+//    int twoFourTenTwo = 1024 * 4;
+ //   int w = pd_entry->pd_base * 4096;
+    int addTwoTwo = ((pt * sizeof(pt_t)) + (pd_entry->pd_base * 4096));
+	pt_t *pt_entry;
     pt_entry = (pt_t *)(addTwoTwo);
 
-    int checkPDPresVal = pt_entry->pt_pres;
+  //  int checkPDPresVal = pt_entry->pt_pres;
+	int newFrame;
+	int store, pageth;
+    if (pt_entry->pt_pres == 0) 
+	{
+			get_frm(&newFrame);
+			pt_entry->pt_base = 1024 + newFrame;
+			int sub = pd_entry->pd_base - 1024;
+			pt_entry->pt_pres   = 1;
+			pt_entry->pt_write  = 1;
+			//int newFrameAdd = 1024 + newFrame;
+			int passVal = (1024 + newFrame) * 4096;
+			frm_tab[sub].fr_refcnt+= 1;
+			int ins_vpno = virtualAddress/4096;
+			frm_tab[newFrame].fr_status = FRM_MAPPED;
+			frm_tab[newFrame].fr_type   = FR_TBL;
+			frm_tab[newFrame].fr_pid    = currpid;
+			frm_tab[newFrame].fr_vpno   = ins_vpno;
 
-    if (checkPDPresVal == SETZERO) {
-      get_frm(&newFrame);
-
-      pt_entry->pt_pres   = SETONE;
-      pt_entry->pt_write  = SETONE;
-
-      int newFrameAdd = TWOTEN + newFrame;
-      pt_entry->pt_base = newFrameAdd;
-
-      int sub = pd_entry->pd_base - TWOTEN;
-
-
-      frm_tab[sub].fr_refcnt = frm_tab[sub].fr_refcnt + SETONE;
-      frm_tab[newFrame].fr_status = 1;
-      frm_tab[newFrame].fr_type   = 0;
-      frm_tab[newFrame].fr_pid    = currpid;
-      //int divi = virtualAddress/twoFourTenTwo;
-      frm_tab[newFrame].fr_vpno   = virtualAddress/4096;
-
-      bsm_lookup(currpid, virtualAddress, &store, &pageth);
-      int passVal = (TWOTEN + newFrame) * 4096;
-      //passVal = passVal * twoFourTenTwo;
-      read_bs((char *)(passVal), store, pageth);
-
-      }
-
+			bsm_lookup(currpid, virtualAddress, &store, &pageth);
+			
+			read_bs((char *)((1024 + newFrame) * 4096), store, pageth);
+    }
 
   write_cr3(pdbr);
-
   restore(ps);
   return OK;
-
 }

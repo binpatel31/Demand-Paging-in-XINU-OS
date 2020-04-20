@@ -195,7 +195,7 @@ int getFrameSC()
   	return SYSERR;
 }
 
-void frameDefine(int pid) 
+void initiate_frame(int pid) 
 {
 	STATWORD ps;
 	disable(ps);

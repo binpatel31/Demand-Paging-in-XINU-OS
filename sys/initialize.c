@@ -100,21 +100,38 @@ void init_paging(){
 		frm_tab[frm_num].fr_type=FR_TBL;
 		frm_tab[frm_num].fr_status=FRM_MAPPED;
 		frm_tab[frm_num].fr_pid=0;
+		//FOR TRACKING
+		int temp;
+		for(temp=0;temp<NPROC;temp++)
+		{
+			fr_pid_track[i][temp]=0;
+		}
+		//============
 		//loop for first four PT (16MB)
 		pt=(1024 + frm_num)*4096;
 		for(p=0;p<1024;++p)
 		{
+
+                        pt->pt_mbz=0;
+                        pt->pt_global=1;
+
+                        pt->pt_avail=0;
+
+                        pt->pt_base=((i*1024)+ p);
+
 			pt->pt_pres=1;
 			pt->pt_write=1;
 			pt->pt_user=0;
+
 			pt->pt_pwt=0;
 			pt->pt_pcd=0;
 			pt->pt_acc=0;
 			pt->pt_dirty=0;
+			/*
 			pt->pt_mbz=0;
 			pt->pt_global=1;
 			pt->pt_avail=0;
-			pt->pt_base=((i*1024)+ p);
+			pt->pt_base=((i*1024)+ p);*/
 			++pt;
 		}
 	}

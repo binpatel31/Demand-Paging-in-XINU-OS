@@ -391,6 +391,8 @@ get_bs.o: ../paging/get_bs.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
 pdbr_init.o: ../paging/pdbr_init.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
+pfint1.o: ../paging/pfint1.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
 pfint.o: ../paging/pfint.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
 policy.o: ../paging/policy.c /usr/include/stdc-predef.h ../h/conf.h \

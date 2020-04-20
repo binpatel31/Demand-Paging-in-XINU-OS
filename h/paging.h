@@ -72,8 +72,8 @@ typedef struct{
   //int fr_pid_track[NPROC];
 }fr_map_t;
 
-extern bs_map_t bsm_tab[];
-extern fr_map_t frm_tab[];
+//extern bs_map_t bsm_tab[];
+//extern fr_map_t frm_tab[];
 
 extern int fr_pid_track[1024][NPROC];
 /* modified */
@@ -81,6 +81,11 @@ extern int fr_pid_track[1024][NPROC];
 /* Prototypes for required API calls */
 SYSCALL xmmap(int, bsd_t, int);
 SYSCALL xunmap(int);
+
+
+extern bs_map_t bsm_tab[];
+extern fr_map_t frm_tab[];
+
 
 /* given calls for dealing with backing store */
 

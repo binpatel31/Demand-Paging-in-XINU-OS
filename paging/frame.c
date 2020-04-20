@@ -4,9 +4,6 @@
 #include <proc.h>
 #include <paging.h>
 
-//#define SETZERO 0
-//#define SETONE  1
-//#define TWOTEN  1024
 extern int page_replace_policy;
 
 //extern int fr_pid_track[NFRAMES][NPROC];
@@ -19,9 +16,8 @@ SYSCALL init_frm()
 	STATWORD ps;
   	disable(ps);
 	
-  	int i;// = 0;
-	for(i=0;i<NFRAMES;i++)
-  	//while (i < 1024) 
+  	int i;
+	for(i=0;i<NFRAMES;i++) 
 	{
     		frm_tab[i].fr_status  = 0;
     		frm_tab[i].fr_pid     = -1;
@@ -37,7 +33,6 @@ SYSCALL init_frm()
 			
     		scAcc[i]  = 0;
     		scPointer   = 0;
-    		//i = i + 1;
   	}
   	restore(ps);
   	return OK;
@@ -52,24 +47,18 @@ SYSCALL get_frm(int* avail)
   	STATWORD ps;
   	disable(ps);
 
-  	int i;// = 0;
-  	//*avail    = -1;
+  	int i;
 
-	for(i=0;i<NFRAMES;i++)
-  	//while (i < NFRAMES) 
+	for(i=0;i<NFRAMES;i++) 
 	{
-    		//int checkStatus = frm_tab[i].fr_status;
-    
     		if (frm_tab[i].fr_status == FRM_UNMAPPED) 
 		{
-      			//kprintf("IN");
       			scAcc[i] = 1;
-				fr_pid_track[i][currpid]=1;
-				*avail = i;
+			fr_pid_track[i][currpid]=1;
+			*avail = i;
       			restore(ps);
       			return OK;
     		}
-    //		i = i + 1;
   	}
 	
   	int frameNumber;
@@ -77,7 +66,7 @@ SYSCALL get_frm(int* avail)
 	{
     		frameNumber = getFrameSC();
     		free_frm(frameNumber);
-			//set SC bit for that frame
+		//set SC bit for that frame
     		scAcc[frameNumber] = 1;
     		*avail = frameNumber;
     		restore(ps);
@@ -118,15 +107,11 @@ SYSCALL free_frm(int i)
   	STATWORD ps;
   	disable(ps);
   	int pageNumber,index,frameID,storeID;
-  	//int index;
-  	//int frameID;
-  	//int storeID;
-  //	int checkType;
+
   	unsigned long virtualAddress,pdbr;
   	unsigned int pageTable,pageDirectory;
-  	//unsigned int pageDirectory;
-  	//unsigned long pdbr;
-  	pd_t *pd_entry;
+
+    	pd_t *pd_entry;
 	int shift;
   	pt_t *pt_entry;
 
@@ -135,49 +120,34 @@ SYSCALL free_frm(int i)
 	int temp_vpno,temp_pid,temp_pdbr;
   	if (checkType == FR_PAGE) 
 	{
-			int proctabStore;
+		int proctabStore;
 	    	temp_vpno = frm_tab[index].fr_vpno;
     		temp_pid = frm_tab[index].fr_pid;
-			frameID = temp_pid;
-			temp_pdbr = proctab[frameID].pdbr;
-			int get_store = proctab[temp_pid].store;
-			virtualAddress = temp_vpno;
+		frameID = temp_pid;
+		temp_pdbr = proctab[frameID].pdbr;
+		int get_store = proctab[temp_pid].store;
+		virtualAddress = temp_vpno;
     		
     		pdbr = temp_pdbr;
     		
-			int and = 1024 - 1;
-			int inHex = 0x003ff000;
-    		pageTable = virtualAddress & 1023;//andVal;
+		int and = 1024 - 1;
+		int inHex = 0x003ff000;
+    		pageTable = virtualAddress & 1023;
     		shift = 10;
     		pageDirectory = virtualAddress>>10;
-    		proctabStore = get_store; // proctab[temp_pid].store;
+    		proctabStore = get_store;
     		storeID = proctabStore;
 
-    		//int a = sizeof(pd_t);
-    		//int b = pageDirectory;
-    		//int mult = b * a;
-    		//int c = pdbr;
-    		//int add = c + mult;
-			//page _direcory add
-    		pd_entry =  pdbr + (pageDirectory*sizeof(pd_t));//add;
+    		pd_entry =  pdbr + (pageDirectory*sizeof(pd_t));
 			
-			int temp_vpno_2 = frm_tab[index].fr_vpno;
-    		//int d = sizeof(pt_t);
-    		//int e = pageTable;
-    		//int multTwo = d * e;
-    		//int twoFourTen = 1024 * 4;
-    		//int f = pd_entry->pd_base;
-    		//int multThree = twoFourTen * f;
-    		//int addTwo = multTwo + multThree;
-    		pt_entry =  ((sizeof(pt_t)*pageTable)+ (4096*(pd_entry->pd_base)))   ;//addTwo;
-
+		int temp_vpno_2 = frm_tab[index].fr_vpno;
+   
+    		pt_entry =  ((sizeof(pt_t)*pageTable)+ (4096*(pd_entry->pd_base)));
     		int virt_heap_proc;
-			virt_heap_proc = proctab[frameID].vhpno;
+		virt_heap_proc = proctab[frameID].vhpno;
     		
     		pageNumber = frm_tab[index].fr_vpno - proctab[frameID].vhpno;
 
-    		//int indexFrame = index + 1024;
-    		//indexFrame = indexFrame * twoFourTen;
     		write_bs((index+1024)*4096, storeID, pageNumber);
 		int f = pd_entry->pd_base;
     		pt_entry->pt_pres = 0;
@@ -186,16 +156,13 @@ SYSCALL free_frm(int i)
     		if ((frm_tab[frameIndex].fr_refcnt - 1) == 0) 
 		{
       			frm_tab[frameIndex].fr_pid    = -1;
-				//untrack
-				fr_pid_track[frameIndex][currpid]=0;
-				
+			//untrack
+			fr_pid_track[frameIndex][currpid]=0;		
       			frm_tab[frameIndex].fr_status = FRM_UNMAPPED;
       			frm_tab[frameIndex].fr_vpno   = 4096;
       			frm_tab[frameIndex].fr_type   = FR_PAGE;
     		}
-
    	}
-
    	restore(ps);
   	return OK;
 }
@@ -204,42 +171,24 @@ int getFrameSC()
 {
 	STATWORD ps;
   	disable(ps);
-  	int i = scPointer; //0
-  	//i = i + scPointer;
+  	int i = scPointer;
 
   	for(i=scPointer;;i++)
-	//while(1) 
 	{
     		i = i % 1024;
-    		//int checkType = frm_tab[i].fr_type;
-    		if (frm_tab[i].fr_type == FR_PAGE) 
+     		if (frm_tab[i].fr_type == FR_PAGE) 
+		{
+			if (scAcc[i] != 1)
 			{
-      			//int checkSCValue = scAcc[i];
-      			//
-				if (scAcc[i] != 1)
-				{
-					scPointer = i + 1;
+				scPointer = i + 1;
         			restore (ps);
         			return i;
-				}
-				else
-				{
-					scAcc[i]=0;
-				}
-				//
-				//if (checkSCValue == 1) 
-				//{
-        		//	int updateSCVAL = 0;
-        		//	scAcc[i] = updateSCVAL;
-      			//} 
-				//else 
-				//{
-        		//	scPointer = i + 1;
-        		//	restore (ps);
-        		//	return i;
-      			//}
+			}
+			else
+			{
+				scAcc[i]=0;
+			}
     		}
-    		//i = i + 1;
   	}
 
   	restore(ps);
@@ -250,11 +199,9 @@ void frameDefine(int pid)
 {
 	STATWORD ps;
 	disable(ps);
-	int i;// = 0;
-	for(i=0;i<NFRAMES;i++)
-//	while (i < 1024) 
+	int i;
+	for(i=0;i<NFRAMES;i++) 
 	{
-    	//int checkP_i_d = frm_tab[i].fr_pid;
   		if (frm_tab[i].fr_pid == pid) 
 		{
     			frm_tab[i].fr_status= FRM_UNMAPPED;
@@ -276,8 +223,7 @@ void frameDefine(int pid)
 						
 					}
 				}
-				kprintf("%d",test_1);
-				
+				//kprintf("%d",test_1);		
 				frm_tab[i].fr_type= FR_PAGE;
 				frm_tab[i].fr_dirty	= 0;
   		}
@@ -285,8 +231,6 @@ void frameDefine(int pid)
 		{
 			continue;
 		}
-  		
-  		//i = i + 1;
 	}
 	restore(ps);
 }

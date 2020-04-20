@@ -3,8 +3,6 @@
 #include <proc.h>
 #include <paging.h>
 
-#define SETONE  1
-#define SETZERO 0
 int get_bs(bsd_t bs_id, unsigned int npages) 
 {
 	STATWORD ps;
@@ -12,15 +10,13 @@ int get_bs(bsd_t bs_id, unsigned int npages)
   	/* requests a new mapping of npages with ID map_id */
     	
     	int checkSemValue     = bsm_tab[bs_id].bs_sem;
-   	//int checkPrivateValue = bsm_tab[bs_id].bs_private;
- 	//int checkStatus       = bsm_tab[bs_id].bs_status;
     	int pagesValue        = bsm_tab[bs_id].bs_npages;
-   	if (bs_id >= 16 || bs_id < SETZERO)
+   	if (bs_id >= 16 || bs_id < 0)
 	{
 		restore(ps);
 		return SYSERR;
 	}
-	if ( npages > 128 || npages <= SETZERO || checkSemValue == 1) 
+	if ( npages > 128 || npages <= 0 || bsm_tab[bs_id].bs_sem == 1) 
       	{
 		restore(ps);
       		return SYSERR;

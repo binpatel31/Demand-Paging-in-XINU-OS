@@ -48,7 +48,7 @@ int	console_dev;		/* the console device			*/
 
 /*  added for the demand paging */
 int page_replace_policy = SC;
-
+int fr_pid_track[NFRAMES][NPROC];
 /* modified */
 #define SETONE  1
 #define SETZERO 0

@@ -127,30 +127,27 @@ SYSCALL free_frm(int i)
   	//unsigned int pageDirectory;
   	//unsigned long pdbr;
   	pd_t *pd_entry;
-	int shift;
   	pt_t *pt_entry;
 
   	index = i;
   	int checkType = frm_tab[index].fr_type;
-	int temp_vpno,temp_pid,temp_pdbr;
+	int v_p_n_o,p_i_d,p_d_b_r;
   	if (checkType == FR_PAGE) 
 	{
-			int proctabStore;
-	    	temp_vpno = frm_tab[index].fr_vpno;
-    		temp_pid = frm_tab[index].fr_pid;
-			frameID = temp_pid;
-			temp_pdbr = proctab[frameID].pdbr;
-			int get_store = proctab[temp_pid].store;
-			virtualAddress = temp_vpno;
+	    	v_p_n_o = frm_tab[index].fr_vpno;
+    		p_i_d = frm_tab[index].fr_pid;
+			frameID = p_i_d;
+			p_d_b_r = proctab[frameID].pdbr;
+			virtualAddress = v_p_n_o;
     		
-    		pdbr = temp_pdbr;
+    		pdbr = p_d_b_r;
     		
-			int and = 1024 - 1;
+			int andVal = 1024 - 1;
 			int inHex = 0x003ff000;
     		pageTable = virtualAddress & 1023;//andVal;
-    		shift = 10;
-    		pageDirectory = virtualAddress>>10;
-    		proctabStore = get_store; // proctab[temp_pid].store;
+    		int shiftVal = 10;
+    		pageDirectory = virtualAddress>>shiftVal;
+    		int proctabStore = proctab[p_i_d].store;
     		storeID = proctabStore;
 
     		//int a = sizeof(pd_t);
@@ -161,7 +158,7 @@ SYSCALL free_frm(int i)
 			//page _direcory add
     		pd_entry =  pdbr + (pageDirectory*sizeof(pd_t));//add;
 			
-			int temp_vpno_2 = frm_tab[index].fr_vpno;
+			int v_p_n_o_dos = frm_tab[index].fr_vpno;
     		//int d = sizeof(pt_t);
     		//int e = pageTable;
     		//int multTwo = d * e;
@@ -171,8 +168,7 @@ SYSCALL free_frm(int i)
     		//int addTwo = multTwo + multThree;
     		pt_entry =  ((sizeof(pt_t)*pageTable)+ (4096*(pd_entry->pd_base)))   ;//addTwo;
 
-    		int virt_heap_proc;
-			virt_heap_proc = proctab[frameID].vhpno;
+    		int proctabVh = proctab[frameID].vhpno;
     		
     		pageNumber = frm_tab[index].fr_vpno - proctab[frameID].vhpno;
 
@@ -186,9 +182,6 @@ SYSCALL free_frm(int i)
     		if ((frm_tab[frameIndex].fr_refcnt - 1) == 0) 
 		{
       			frm_tab[frameIndex].fr_pid    = -1;
-				//untrack
-				fr_pid_track[frameIndex][currpid]=0;
-				
       			frm_tab[frameIndex].fr_status = FRM_UNMAPPED;
       			frm_tab[frameIndex].fr_vpno   = 4096;
       			frm_tab[frameIndex].fr_type   = FR_PAGE;
@@ -250,43 +243,22 @@ void frameDefine(int pid)
 {
 	STATWORD ps;
 	disable(ps);
-	int i;// = 0;
-	for(i=0;i<NFRAMES;i++)
-//	while (i < 1024) 
+	int index;// = 0;
+	for(index=0;index<NFRAMES;index++)
+//	while (index < 1024) 
 	{
-    	//int checkP_i_d = frm_tab[i].fr_pid;
-  		if (frm_tab[i].fr_pid == pid) 
+    		int checkP_i_d = frm_tab[index].fr_pid;
+  		if (frm_tab[index].fr_pid == pid) 
 		{
-    			frm_tab[i].fr_status= FRM_UNMAPPED;
-				frm_tab[i].fr_pid= -1;
-				//untrack
-				fr_pid_track[i][pid]=0;
-				
-				frm_tab[i].fr_vpno= 4096;
-				frm_tab[i].fr_refcnt= 0;
-				//which pid in i is current active
-				int test_1;
-				int debug=0;
-				for (debug=0;debug<NPROC;debug++)
-				{
-					if (fr_pid_track[i][pid]=1)
-					{
-						test_1=pid;
-						break;
-						
-					}
-				}
-				kprintf("%d",test_1);
-				
-				frm_tab[i].fr_type= FR_PAGE;
-				frm_tab[i].fr_dirty	= 0;
+    			frm_tab[index].fr_status= 0;
+				frm_tab[index].fr_pid= -1;
+				frm_tab[index].fr_vpno= 1024 * 4;
+				frm_tab[index].fr_refcnt= 0;
+				frm_tab[index].fr_type= 0;
+				frm_tab[index].fr_dirty	= 0;
   		}
-		else
-		{
-			continue;
-		}
   		
-  		//i = i + 1;
+  		//index = index + 1;
 	}
 	restore(ps);
 }

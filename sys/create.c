@@ -15,7 +15,6 @@ LOCAL int newpid();
 #define SETZERO 0
 #define TWOTEN  1024
 
-//void createPageDir(int i);
 //============================================
 void createPageDir(int pid)
 {
@@ -171,54 +170,4 @@ LOCAL int newpid()
 	return(SYSERR);
 }
 
-/*
-void createPageDir(int pid) 
-{
-	int fr_pid_track[1024][50];
-	//int index = pid;
-  	int frameAvail = 0;
-	int b;
-  	pd_t *pd_entry;
-	
-	int temp=fr_pid_track[frameAvail][pid];
- 	get_frm(&frameAvail);
-	
-	int a = (1024 + frameAvail);
-	int sz = a*4096;
-	int limit = 4;
-	proctab[pid].pdbr = sz;
-	//=======
-	int proc=0;
-	while(proc<NPROC)
-	{
-		if(pid == PROC)
-		{
-			fr_pid_track[frameAvail][proc]=1;
-		}
-		proc+=1;
-	}
-	//=====
-	frm_tab[frameAvail].fr_status = BSM_MAPPED;
-	frm_tab[frameAvail].fr_type   = FR_DIR;
-	frm_tab[frameAvail].fr_pid    = pid;
-
-  	pd_entry =   proctab[pid].pdbr ;
- // 	int indexDos = SETZERO; indexDos = b
-	for(b=0; b< ((1024 * 4)/sizeof(pd_t));++b)
- //	while (indexDos < (TWOTEN * 4)/sizeof(pd_t)) 
-	{
-     	//	pd_entry[b].pd_write = 1;
-    		
-    		if (b < limit) 
-			{
-        		int addIs = 1024 + b;
-      			pd_entry[b].pd_base = addIs;
-      			pd_entry[b].pd_pres = 1;
-    		}
-		pd_entry[b].pd_write = 1;
-    		//indexDos = indexDos + SETONE;
-  	}
-
-}
-*/
 

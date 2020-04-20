@@ -381,6 +381,10 @@ control_reg.o: ../paging/control_reg.c /usr/include/stdc-predef.h \
  ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h
 dump32.o: ../paging/dump32.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h
+frame1.o: ../paging/frame1.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
+frame2.o: ../paging/frame2.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
 frame.o: ../paging/frame.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
 get_bs.o: ../paging/get_bs.c /usr/include/stdc-predef.h ../h/conf.h \

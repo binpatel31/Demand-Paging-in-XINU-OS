@@ -16,12 +16,13 @@ SYSCALL srpolicy(int policy)
 
   //kprintf("POLICITY To be implemented!\n");
 
-  int setPolicy = policy;
-  if (setPolicy != 3) {
-    return SYSERR;
-  }
-  page_replace_policy = setPolicy;
-  return OK;
+
+  	if (policy == 3 || policy == 4) 
+	{
+    		page_replace_policy = policy;
+  		return OK;
+  	}
+  	return SYSERR;
 }
 
 /*-------------------------------------------------------------------------

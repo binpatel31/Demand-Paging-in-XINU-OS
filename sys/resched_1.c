@@ -7,7 +7,9 @@
 #include <paging.h>
 
 unsigned long currSP;	/* REAL sp of current process */
-
+#define SETONE 	1
+#define SETZERO	0
+#define TWOTEN 	1024
 /*------------------------------------------------------------------------
  * resched  --  reschedule processor to highest priority ready process
  *
@@ -22,11 +24,11 @@ int	resched()
 	register struct	pentry	*optr;	/* pointer to old process entry */
 	register struct	pentry	*nptr;	/* pointer to new process entry */
 	register int i;
-	//int store;
-	//int pageth;
-	//int hasToLookup;
-	//int oldProcessID;
-	
+	int store;
+	int pageth;
+	int hasToLookup;
+	int oldProcessID;
+	int index;
 
 	disable(PS);
 	/* no switch needed if current process priority higher than next*/
@@ -89,55 +91,50 @@ int	resched()
 	PrintSaved(nptr);
 #endif
 
-	int ind,store,pageth;
-	//oldProcessID = ;
-	//i = SETZERO;
-	for(ind=0;ind<1024;ind++)
-	//while (ind < TWOTEN) {
-	{
-		//int checkPid = ;
-		//int checkTyp = ;
-		if (frm_tab[ind].fr_pid == (optr - proctab)) 
-		{
-			if(frm_tab[ind].fr_type == FR_PAGE)
-			{
-				long sz = (frm_tab[ind].fr_vpno * 4096);
-				//hasToLookup = ;
-				if (bsm_lookup((optr - proctab),sz,&store, &pageth) == SYSERR) 
-				{
-					continue;
-				}
-				write_bs(((ind + 1024)*4096), store, pageth);
+
+	oldProcessID = optr - proctab;
+	index = SETZERO;
+
+	while (index < TWOTEN) {
+		/* code */
+		int checkPid = frm_tab[index].fr_pid;
+		int checkTyp = frm_tab[index].fr_type;
+		if (checkPid == oldProcessID && checkTyp == SETZERO) {
+			/* code */
+			// int q = oldProcessID;
+			// int w = frm_tab[index].fr_vpno * TWOTEN * 4;
+
+			hasToLookup = bsm_lookup(oldProcessID,(frm_tab[index].fr_vpno * TWOTEN * 4),&store, &pageth);
+			if (hasToLookup == SYSERR) {
+				continue;
 			}
+			// int e = index + TWOTEN;
+			// e = e * TWOTEN * 4;
+			write_bs(((index + TWOTEN)*TWOTEN*4), store, pageth);
 		}
-		//ind = ind + SETONE;
+		index = index + SETONE;
 	}
 
-	//ind = SETZERO;
-	for(ind=0;ind<1024;ind++)
-	//while (ind < TWOTEN) 
-	{
-		//int checkPIDNew = ;
-		//int checkTypeNew = ;
-		if (frm_tab[ind].fr_type == FR_PAGE) 
-		{
-			if(frm_tab[ind].fr_pid == currpid)
-			{
-				//int vpnoTolookup = frm_tab[ind].fr_vpno;
-				long vpnoTolookup = frm_tab[ind].fr_vpno * 4096;
-				//hasToLookup = bsm_lookup(currpid, vpnoTolookup, &store, &pageth);
-				if (bsm_lookup(currpid, vpnoTolookup, &store, &pageth) == SYSERR) 
-				{
-					continue;
-				}
-				//int frameInt = (ind + TWOTEN)* 4096;
-				// frameInt = frameInt * TWOTEN * 4;
-				read_bs(((ind + 1024)* 4096), store, pageth);
+index = SETZERO;
+	while (index < TWOTEN) {
+		/* code */
+		int checkPIDNew = frm_tab[index].fr_pid;
+		int checkTypeNew = frm_tab[index].fr_type;
+
+		if (checkPIDNew == currpid && checkTypeNew == 0) {
+			/* code */
+			int vpnoTolookup = frm_tab[index].fr_vpno;
+			// vpnoTolookup = vpnoTolookup * TWOTEN * 4;
+			hasToLookup = bsm_lookup(currpid, (vpnoTolookup*TWOTEN * 4), &store, &pageth);
+			if (hasToLookup == SYSERR) {
+				continue;
 			}
+			int frameInt = (index + TWOTEN)* TWOTEN * 4;
+			// frameInt = frameInt * TWOTEN * 4;
+			read_bs(frameInt, store, pageth);
 		}
-		//ind = ind + SETONE;
+		index = index + SETONE;
 	}
-	
 	pdbr_init(currpid);
 	ctxsw(&optr->pesp, optr->pirmask, &nptr->pesp, nptr->pirmask);
 

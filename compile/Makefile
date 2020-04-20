@@ -518,6 +518,9 @@ recvclr.o: ../sys/recvclr.c /usr/include/stdc-predef.h ../h/conf.h \
 recvtim.o: ../sys/recvtim.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/q.h \
  ../h/sleep.h ../h/stdio.h
+resched_1.o: ../sys/resched_1.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/q.h \
+ ../h/paging.h
 resched.o: ../sys/resched.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/q.h \
  ../h/paging.h

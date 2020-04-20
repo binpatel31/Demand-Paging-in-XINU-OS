@@ -6,7 +6,6 @@
 #include <q.h>
 #include <paging.h>
 
-extern void pdbr_init(int);
 unsigned long currSP;	/* REAL sp of current process */
 #define SETONE 	1
 #define SETZERO	0

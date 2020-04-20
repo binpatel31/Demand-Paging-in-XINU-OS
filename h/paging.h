@@ -69,11 +69,13 @@ typedef struct{
   int fr_dirty;
   // for least frequently used 
   int fr_cnt;
+  //int fr_pid_track[NPROC];
 }fr_map_t;
 
 extern bs_map_t bsm_tab[];
 extern fr_map_t frm_tab[];
 
+extern int fr_pid_track[1024][NPROC];
 /* modified */
 
 /* Prototypes for required API calls */

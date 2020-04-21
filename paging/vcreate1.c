@@ -12,6 +12,10 @@
 /*
 static unsigned long esp;
 */
+#define SETONE  1
+#define SETZERO 0
+#define TWOTEN  1024
+
 
 LOCAL	newpid();
 /*------------------------------------------------------------------------
@@ -28,56 +32,41 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 	long	args;			/* arguments (treated like an	*/
 					/* array in the code)		*/
 {
-	STATWORD ps;
-	disable(ps);
-	//int a = BACKING_STORE_BASE;
-	//int b = BACKING_STORE_UNIT_SIZE;
-	int pid;
-	int store;
-//	kprintf("=====");
-	//int checkStore;
-	//checkStore = ;
+	//kprintf(" VCREATE To be implemented!\n");
 
-	if (get_bsm(&store) == SYSERR) 
-	{
-		restore (ps);
-		return SYSERR;
-	}
-	pid = create(procaddr, ssize, priority, name, nargs, args);
-	
-	//int twoFourTen = TWOTEN * 4;
-	
-	//bsm_map(pid, twoFourTen, store, hsize);
-	//=================================
-	bsm_tab[store].bs_status = BSM_MAPPED;
-    bsm_tab[store].bs_npages = hsize;
-  
-    bsm_tab[store].bs_pid[pid] = 1;
-    bsm_tab[store].bs_sem      = 0;
-	bsm_tab[store].bs_vpno[pid]= 4096;
-	bsm_tab[store].bs_reference_cnt=1;
-	bsm_tab[store].bs_mapping = 1;
-	proctab[currpid].vhpno = 4096;
-	proctab[currpid].store = store;
-	proctab[currpid].bs[store]=1;
+  STATWORD ps;
+  disable(ps);
+  int a = BACKING_STORE_BASE;
+  int b = BACKING_STORE_UNIT_SIZE;
+  int pid;
+  int store;
 
-	//==================
-	bsm_tab[store].bs_private = 1;
-	int next = (struct mblock *)(4096 * 4096);
-	proctab[pid].vhpnpages = hsize;
-	//int list = getmem(sizeof(struct mblock *));
-	proctab[pid].vmemlist = getmem(sizeof(struct mblock *));
-	
-	proctab[pid].vmemlist->mnext = next;
-	proctab[pid].vmemlist->mlen = 0;
+  int checkStore;
+  pid = create(procaddr, ssize, priority, name, nargs, args);
+  checkStore = get_bsm(&store);
 
-	struct mblock *baseblock;
-	//int c = store * b;
-	baseblock = BACKING_STORE_BASE + (store * BACKING_STORE_UNIT_SIZE);
-	baseblock->mlen = 4096 * hsize;
-	baseblock->mnext = NULL;
+  if (checkStore == SYSERR) {
+    restore (ps);
+    return SYSERR;
+  }
+  int twoFourTen = TWOTEN * 4;
+  bsm_map(pid, twoFourTen, store, hsize);
+  bsm_tab[store].bs_private = SETONE;
 
-	restore(ps);
+  proctab[pid].vhpnpages = hsize;
+  int list = getmem(sizeof(struct mblock *));
+  proctab[pid].vmemlist = list;
+  int next = (struct mblock *)(twoFourTen * twoFourTen);
+  proctab[pid].vmemlist->mnext = next;
+  proctab[pid].vmemlist->mlen = SETZERO;
+
+  struct mblock *baseblock;
+  int c = store * b;
+  baseblock = a + c;
+  baseblock->mlen = twoFourTen * hsize;
+  baseblock->mnext = NULL;
+
+  restore(ps);
 	return pid;
 }
 

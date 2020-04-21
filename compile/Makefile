@@ -403,6 +403,9 @@ read_bs.o: ../paging/read_bs.c /usr/include/stdc-predef.h ../h/conf.h \
 release_bs.o: ../paging/release_bs.c /usr/include/stdc-predef.h \
  ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
  ../h/paging.h
+vcreate1.o: ../paging/vcreate1.c /usr/include/stdc-predef.h ../h/conf.h \
+ ../h/i386.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
+ ../h/sem.h ../h/io.h ../h/paging.h
 vcreate.o: ../paging/vcreate.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/i386.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
  ../h/sem.h ../h/io.h ../h/paging.h

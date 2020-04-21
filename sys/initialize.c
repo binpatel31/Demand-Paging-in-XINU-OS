@@ -22,6 +22,11 @@ extern	int	main();	/* address of user's main prog	*/
 
 extern	int	start();
 
+//
+bs_map_t bsm_tab[16];
+fr_map_t frm_tab[1024];
+
+//
 LOCAL		sysinit();
 
 /* Declarations of major kernel variables */
@@ -41,24 +46,24 @@ struct  tty     tty[Ntty];	/* SLU buffers and mode control		*/
 int	numproc;		/* number of live user processes	*/
 int	currpid;		/* id of currently running process	*/
 int	reboot = 0;		/* non-zero after first boot		*/
+int lfu_cnt[1024];
+int scAcc[1024];
 
 int	rdyhead,rdytail;	/* head/tail of ready list (q indicies)	*/
 char 	vers[80];
 int	console_dev;		/* the console device			*/
-
+int scPointer;
 /*  added for the demand paging */
 int page_replace_policy = SC;
 int fr_pid_track[NFRAMES][NPROC];
-/* modified */
-#define SETONE  1
-#define SETZERO 0
-#define TWOTEN  1024
-bs_map_t bsm_tab[SETONE * 16];
-fr_map_t frm_tab[1024];
-int counterPint=SETZERO;
-int lfu_cnt[1024];
-int scAcc[1024];
-int scPointer;
+
+
+//bs_map_t bsm_tab[16];
+//fr_map_t frm_tab[1024];
+int counterPint=0;
+//int lfu_cnt[1024];
+//int scAcc[1024];
+
 
 
 /************************************************************************/

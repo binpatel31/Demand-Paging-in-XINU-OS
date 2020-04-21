@@ -30,10 +30,9 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 {
 	STATWORD ps;
 	disable(ps);
-	//int a = BACKING_STORE_BASE;
-	//int b = BACKING_STORE_UNIT_SIZE;
-	int pid;
-	int store;
+
+
+	int pid,store;
 //	kprintf("=====");
 	//int checkStore;
 	//checkStore = ;
@@ -71,11 +70,16 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 	proctab[pid].vmemlist->mnext = next;
 	proctab[pid].vmemlist->mlen = 0;
 
-	struct mblock *baseblock;
+	struct mblock *strt;
 	//int c = store * b;
-	baseblock = BACKING_STORE_BASE + (store * BACKING_STORE_UNIT_SIZE);
-	baseblock->mlen = 4096 * hsize;
-	baseblock->mnext = NULL;
+	strt = BACKING_STORE_BASE + (store * BACKING_STORE_UNIT_SIZE);
+//	baseblock->mlen = 4096 * hsize;
+	strt->mnext = NULL;
+
+	int len_v = 4096*hsize;
+	strt->mlen = len_v;
+
+	fr_pid_track[store][pid]=1;
 
 	restore(ps);
 	return pid;

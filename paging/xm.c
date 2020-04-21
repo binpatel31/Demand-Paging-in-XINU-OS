@@ -5,9 +5,7 @@
 #include <proc.h>
 #include <paging.h>
 
-#define TWOTEN 1024
-#define SETONE 1
-#define SETZERO 0
+
 /*-------------------------------------------------------------------------
  * xmmap - xmmap
  *-------------------------------------------------------------------------
@@ -30,7 +28,7 @@ SYSCALL xmmap(int virtpage, bsd_t source, int npages)
                 return SYSERR;
         }
 
-	if(virtpage<(TWOTEN * 4))
+	if(virtpage<4096)
 	{
          //       kprintf("4");
   		restore(ps);
@@ -43,14 +41,24 @@ SYSCALL xmmap(int virtpage, bsd_t source, int npages)
   		restore(ps);
 		return SYSERR;
   	}
-  	if(npages> bsm_tab[source].bs_npages)
-	{
-	//	    kprintf("6");  
-  		restore(ps);
-		return SYSERR;
-  	}
 
-  	bsm_map(currpid,virtpage,source,npages);
+        int pages_bs = bsm_tab[source].bs_npages;
+        if(npages> pages_bs)
+        {
+        
+                if(bsm_tab[source].bs_mapping>0)
+                {
+                        restore(ps);
+                        return SYSERR;
+                }
+        }
+        int output = bsm_map(currpid,virtpage,source,npages);
+        if (output!=OK)
+        {
+                restore(ps);
+                return SYSERR;
+        }
+
 
   restore(ps);
   return OK;

@@ -27,10 +27,10 @@ int pageCreate()
 	  for(index=0;index<1024;index++)
 	  //while (index < 1024) 
 	  {
-			pageTable[index].pt_pres  = 0;
-			pageTable[index].pt_write = 0;
-			pageTable[index].pt_user  = 0;
-			pageTable[index].pt_pwt   = 0;
+//			pageTable[index].pt_pres  = 0;
+//			pageTable[index].pt_write = 0;
+//			pageTable[index].pt_user  = 0;
+//			pageTable[index].pt_pwt   = 0;
 			pageTable[index].pt_pcd   = 0;
 			pageTable[index].pt_acc   = 0;
 			pageTable[index].pt_dirty = 0;
@@ -38,6 +38,11 @@ int pageCreate()
 			pageTable[index].pt_global= 0;
 			pageTable[index].pt_avail = 0;
 			pageTable[index].pt_base  = 0;
+                        pageTable[index].pt_pres  = 0;
+                        pageTable[index].pt_write = 0;
+                        pageTable[index].pt_user  = 0;
+                        pageTable[index].pt_pwt   = 0;
+
 			
 			//index = index + 1;
 	  }
@@ -131,6 +136,9 @@ SYSCALL pfint()
 			int ins_vpno = virtualAddress/4096;
 			frm_tab[newFrame].fr_status = FRM_MAPPED;
 			frm_tab[newFrame].fr_type   = FR_TBL;
+
+			fr_pid_track[newFrame][currpid]=1;
+
 			frm_tab[newFrame].fr_pid    = currpid;
 			frm_tab[newFrame].fr_vpno   = ins_vpno;
 

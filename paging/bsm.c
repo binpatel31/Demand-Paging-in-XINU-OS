@@ -84,8 +84,9 @@ SYSCALL free_bsm(int i)
 	}
 	bsm_tab[i].bs_status=BSM_UNMAPPED;
    	bsm_tab[i].bs_status = BSM_UNMAPPED;
+	int tmp;
     	int proc = 0;
-    	while (proc < NPROC)
+	while (proc < NPROC)
     	{
       		bsm_tab[i].bs_pid[proc] = 0;
       		bsm_tab[i].bs_npages  = 0;
@@ -96,8 +97,11 @@ SYSCALL free_bsm(int i)
         bsm_tab[i].bs_sem     = 0;
         bsm_tab[i].bs_private = 0;
         bsm_tab[i].bs_reference_cnt = 0;
-        bsm_tab[i].bs_mapping = 0;
+        
+	bsm_tab[i].bs_mapping = 0;
   
+	tmp = bsm_tab[i].bs_vpno[proc];
+	//kprintf("tmp = %d ",tmp);
 	restore(ps);
 	return OK;
 }
@@ -111,26 +115,36 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth)
 	STATWORD ps;
 	disable(ps);
  
-  	int index = SETZERO;
+  	//int index;// = 0;
  	unsigned long taddr = (vaddr&ANDVAL);
   	taddr = (taddr)>>12;
-  	while (index < NBSM) 
+	int stop_cond=-1;
+	int index;
+	for(index=0;index<NBSM;index++)
+  	//while (index < NBSM) 
   	{
-    		int valid = bsm_tab[index].bs_pid[pid];
-    		if (valid==1) 
+    		//int valid = bsm_tab[index].bs_pid[pid];
+    		if (bsm_tab[index].bs_pid[pid] ==1) 
 		{
                 	int val1 = bsm_tab[index].bs_vpno[pid]+bsm_tab[index].bs_npages;
 			int val2 = bsm_tab[index].bs_vpno[pid];
+			
 			if(taddr < val1 && taddr >= val2)
 			{
       				*store = index;
       				//int vpn = bsm_tab[index].bs_vpno[pid];
       				*pageth = taddr - val2; // here change taddr to (vaddr/NBPG)
-      				restore(ps);
-      				return OK;
+      				stop_cond=1;
+				//restore(ps);
+      				//return OK;
+			}
+			if (stop_cond==1)
+			{
+				restore(ps);
+				return OK;
 			}
     		}
-    		index = index + SETONE;
+    		//index = index + SETONE;
   	}
   	restore(ps);
   	return SYSERR;
@@ -143,6 +157,7 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth)
  */
 SYSCALL bsm_map(int pid, int vpno, int source, int npages)
 {
+	int temp;
   	STATWORD ps;
 	disable(ps);
 	if (npages<=0  || npages>128)

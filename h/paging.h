@@ -6,6 +6,10 @@
 
 typedef unsigned int	 bsd_t;
 
+extern int scAcc[];
+extern int scPointer;
+
+
 /* Structure for a page directory entry */
 
 typedef struct {
@@ -49,14 +53,19 @@ typedef struct{
 typedef struct{
   int bs_status;			/* MAPPED or UNMAPPED		*/
   int bs_pid[NPROC];                    /* process id using this slot   */
+
+  int bs_reference_cnt;                   // total process ref this Backing store
+  int bs_max_npages;
+
+
   int bs_vpno[NPROC];                   /* starting virtual page number */
   int bs_npages;			/* number of pages in the store */
   int bs_sem;				/* semaphore mechanism ?	*/
   int bs_private;
   int bs_mapping;
   // NEW ONE DELETE IF NOT NEEDED
-  int bs_reference_cnt;                   // total process ref this Backing store
-  int bs_max_npages;
+//  int bs_reference_cnt;                   // total process ref this Backing store
+//  int bs_max_npages;
 } bs_map_t;
 
 //frame map 
@@ -112,8 +121,9 @@ SYSCALL write_bs(char *, bsd_t, int);
 
 #define SC 3
 #define LFU 4
-extern int scAcc[];
-extern int scPointer;
+
+//extern int scAcc[];
+//extern int scPointer;
 
 
 #define BACKING_STORE_BASE	0x00800000

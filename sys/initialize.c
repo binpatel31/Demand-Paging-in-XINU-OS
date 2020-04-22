@@ -53,16 +53,13 @@ int	rdyhead,rdytail;	/* head/tail of ready list (q indicies)	*/
 char 	vers[80];
 int	console_dev;		/* the console device			*/
 int scPointer;
-/*  added for the demand paging */
+
 int page_replace_policy = SC;
 int fr_pid_track[NFRAMES][NPROC];
 
 
-//bs_map_t bsm_tab[16];
-//fr_map_t frm_tab[1024];
+
 int counterPint=0;
-//int lfu_cnt[1024];
-//int scAcc[1024];
 
 
 
@@ -132,11 +129,7 @@ void init_paging(){
 			pt->pt_pcd=0;
 			pt->pt_acc=0;
 			pt->pt_dirty=0;
-			/*
-			pt->pt_mbz=0;
-			pt->pt_global=1;
-			pt->pt_avail=0;
-			pt->pt_base=((i*1024)+ p);*/
+
 			++pt;
 		}
 	}

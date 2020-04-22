@@ -16,21 +16,14 @@ int pageCreate()
 	  
 
 	  get_frm(&frameNumber);
-//	  int twoFourTen = 1024 * 4;
 
-	  //frameAddress = ;
 	  unsigned int frameAddress;
 	  frameAddress = (1024 + frameNumber) * 4096;
 
 	  pt_t *pageTable = (pt_t *)frameAddress;
 	  int index;// = 0;
-	  for(index=0;index<1024;index++)
-	  //while (index < 1024) 
+	  for(index=0;index<1024;index++) 
 	  {
-//			pageTable[index].pt_pres  = 0;
-//			pageTable[index].pt_write = 0;
-//			pageTable[index].pt_user  = 0;
-//			pageTable[index].pt_pwt   = 0;
 			pageTable[index].pt_pcd   = 0;
 			pageTable[index].pt_acc   = 0;
 			pageTable[index].pt_dirty = 0;
@@ -42,9 +35,6 @@ int pageCreate()
                         pageTable[index].pt_write = 0;
                         pageTable[index].pt_user  = 0;
                         pageTable[index].pt_pwt   = 0;
-
-			
-			//index = index + 1;
 	  }
 	  restore(ps);
 	  return frameNumber;
@@ -66,9 +56,7 @@ SYSCALL pfint()
 	  
 	  
 	  pt_t *pageTable;
-	  
-	 //  unsigned long tmp_read;
-	 // tmp_read = read_cr2();
+
 	  unsigned long virtualAddress;
 	  virtualAddress = read_cr2();   //tmp_read;
 
@@ -80,13 +68,9 @@ SYSCALL pfint()
 	  pd = virt_addr->pd_offset;
 	  pdbr = proctab[currpid].pdbr;
 
-	  //int a = sizeof(pd_t);
-	  //int b = pd * a;
-	  //int add = pdbr + b;
 	  pd_t *pd_entry;
 	  pd_entry = pdbr + (virt_addr->pd_offset * sizeof(pd_t) );
 
-	  //int checkPresVal = pd_entry->pd_pres;
 	  int new_PT; 
 	  if (pd_entry->pd_pres == 0)
 	  {
@@ -103,34 +87,29 @@ SYSCALL pfint()
 			pd_entry->pd_pcd    = 0;
 
 			
-		//	int base = 1024 + new_PT;
+		       //	int base = 1024 + new_PT;
 			pd_entry->pd_base = 1024 + new_PT;
 
 			frm_tab[new_PT].fr_status = FRM_MAPPED;
+			frm_tab[new_PT].fr_refcnt = 0;
 			frm_tab[new_PT].fr_type   = FR_TBL;
 			int base = 1024 + new_PT;
 			frm_tab[new_PT].fr_pid    = currpid;
-     }
-
-//    int q = sizeof(pt_t);
- //   int multTwo = pt * sizeof(pt_t);
-//    int twoFourTenTwo = 1024 * 4;
- //   int w = pd_entry->pd_base * 4096;
-    int addTwoTwo = ((pt * sizeof(pt_t)) + (pd_entry->pd_base * 4096));
+     	}
+    	int addTwoTwo = ((pt * sizeof(pt_t)) + (pd_entry->pd_base * 4096));
 	pt_t *pt_entry;
-    pt_entry = (pt_t *)(addTwoTwo);
+	pt_entry = (pt_t *)(addTwoTwo);
 
-  //  int checkPDPresVal = pt_entry->pt_pres;
 	int newFrame;
 	int store, pageth;
-    if (pt_entry->pt_pres == 0) 
+    	if (pt_entry->pt_pres == 0) 
 	{
 			get_frm(&newFrame);
 			pt_entry->pt_base = 1024 + newFrame;
 			int sub = pd_entry->pd_base - 1024;
 			pt_entry->pt_pres   = 1;
 			pt_entry->pt_write  = 1;
-			//int newFrameAdd = 1024 + newFrame;
+	
 			int passVal = (1024 + newFrame) * 4096;
 			frm_tab[sub].fr_refcnt+= 1;
 			int ins_vpno = virtualAddress/4096;

@@ -6,7 +6,6 @@
 
 extern int page_replace_policy;
 
-//extern int fr_pid_track[NFRAMES][NPROC];
 /*-------------------------------------------------------------------------
  * init_frm - initialize frm_tab
  *-------------------------------------------------------------------------
@@ -27,7 +26,7 @@ SYSCALL init_frm()
 			{
 				fr_pid_track[i][p]=-1;
 			}
-			frm_tab[i].fr_refcnt  = 0;
+		frm_tab[i].fr_refcnt  = 0;
     		frm_tab[i].fr_type    = 0;
     		frm_tab[i].fr_dirty   = 0;
 			
@@ -66,8 +65,8 @@ SYSCALL get_frm(int* avail)
 	{
     		frameNumber = getFrameSC();
     		free_frm(frameNumber);
-		//set SC bit for that frame
-    		scAcc[frameNumber] = 1;
+   		
+		scAcc[frameNumber] = 1;
     		*avail = frameNumber;
     		restore(ps);
     		return OK;
@@ -79,12 +78,12 @@ SYSCALL get_frm(int* avail)
     		int min_frame=-1;
     		for(fr=0;fr<NFRAMES;++fr)
     		{
-        		if(frm_tab[fr].fr_type == FR_PAGE && frm_tab[fr].fr_cnt<min)
+        		if(frm_tab[fr].fr_type == FR_PAGE && frm_tab[fr].fr_refcnt<min)
         		{
-               			min = frm_tab[fr].fr_cnt;
+               			min = frm_tab[fr].fr_refcnt;
                 		min_frame=fr;
         		}
-			else if(frm_tab[fr].fr_cnt == min && (frm_tab[fr].fr_vpno > frm_tab[min_frame].fr_vpno))
+			else if(frm_tab[fr].fr_refcnt == min && (frm_tab[fr].fr_vpno > frm_tab[min_frame].fr_vpno))
 			{
 				min_frame=fr;
 			}
@@ -118,7 +117,7 @@ SYSCALL free_frm(int i)
   	index = i;
   	int checkType = frm_tab[index].fr_type;
 	int temp_vpno,temp_pid,temp_pdbr;
-  	if (checkType == FR_PAGE) 
+  	if (frm_tab[index].fr_type == FR_PAGE) 
 	{
 		int proctabStore;
 	    	temp_vpno = frm_tab[index].fr_vpno;
@@ -152,8 +151,8 @@ SYSCALL free_frm(int i)
 		int f = pd_entry->pd_base;
     		pt_entry->pt_pres = 0;
     		int frameIndex =  f - 1024;
-
-    		if ((frm_tab[frameIndex].fr_refcnt - 1) == 0) 
+		frm_tab[frameIndex].fr_refcnt-=1;
+    		if ((frm_tab[frameIndex].fr_refcnt) == 0) 
 		{
       			frm_tab[frameIndex].fr_pid    = -1;
 			//untrack

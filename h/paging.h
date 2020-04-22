@@ -1,7 +1,5 @@
 /* paging.h */
 
-//#ifndef _PAGING_H_
-//#define _PAGING_H_
 
 
 typedef unsigned int	 bsd_t;
@@ -64,8 +62,6 @@ typedef struct{
   int bs_private;
   int bs_mapping;
   // NEW ONE DELETE IF NOT NEEDED
-//  int bs_reference_cnt;                   // total process ref this Backing store
-//  int bs_max_npages;
 } bs_map_t;
 
 //frame map 
@@ -78,11 +74,8 @@ typedef struct{
   int fr_dirty;
   // for least frequently used 
   int fr_cnt;
-  //int fr_pid_track[NPROC];
 }fr_map_t;
 
-//extern bs_map_t bsm_tab[];
-//extern fr_map_t frm_tab[];
 
 extern int fr_pid_track[1024][NPROC];
 /* modified */
@@ -122,12 +115,9 @@ SYSCALL write_bs(char *, bsd_t, int);
 #define SC 3
 #define LFU 4
 
-//extern int scAcc[];
-//extern int scPointer;
 
 
 #define BACKING_STORE_BASE	0x00800000
 //as we have total pages = 128...so 512 KB is what each back store require
 #define BACKING_STORE_UNIT_SIZE 0x00080000    
 
-//#endif

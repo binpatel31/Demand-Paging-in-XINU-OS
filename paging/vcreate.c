@@ -33,9 +33,6 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 
 
 	int pid,store;
-//	kprintf("=====");
-	//int checkStore;
-	//checkStore = ;
 
 	if (get_bsm(&store) == SYSERR) 
 	{
@@ -44,15 +41,12 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 	}
 	pid = create(procaddr, ssize, priority, name, nargs, args);
 	
-	//int twoFourTen = TWOTEN * 4;
-	
-	//bsm_map(pid, twoFourTen, store, hsize);
 	//=================================
 	bsm_tab[store].bs_status = BSM_MAPPED;
-    bsm_tab[store].bs_npages = hsize;
+    	bsm_tab[store].bs_npages = hsize;
   
-    bsm_tab[store].bs_pid[pid] = 1;
-    bsm_tab[store].bs_sem      = 0;
+    	bsm_tab[store].bs_pid[pid] = 1;
+    	bsm_tab[store].bs_sem      = 0;
 	bsm_tab[store].bs_vpno[pid]= 4096;
 	bsm_tab[store].bs_reference_cnt=1;
 	bsm_tab[store].bs_mapping = 1;
@@ -64,16 +58,16 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 	bsm_tab[store].bs_private = 1;
 	int next = (struct mblock *)(4096 * 4096);
 	proctab[pid].vhpnpages = hsize;
-	//int list = getmem(sizeof(struct mblock *));
+
 	proctab[pid].vmemlist = getmem(sizeof(struct mblock *));
 	
 	proctab[pid].vmemlist->mnext = next;
 	proctab[pid].vmemlist->mlen = 0;
 
 	struct mblock *strt;
-	//int c = store * b;
+
 	strt = BACKING_STORE_BASE + (store * BACKING_STORE_UNIT_SIZE);
-//	baseblock->mlen = 4096 * hsize;
+
 	strt->mnext = NULL;
 
 	int len_v = 4096*hsize;

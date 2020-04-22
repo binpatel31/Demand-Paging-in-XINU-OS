@@ -5,10 +5,6 @@
 #include <paging.h>
 #include <proc.h>
 
-#define SETZERO 0
-#define SETONE  1
-#define TWOTEN  1024
-
 #define ANDVAL  0xfffff000
 /*-------------------------------------------------------------------------
  * init_bsm- initialize bsm_tab
@@ -19,7 +15,6 @@ SYSCALL init_bsm(){
   STATWORD ps;
   disable(ps);
   int index = 0;
-  int twoFourTen = TWOTEN * 4;
   while (index< NBSM) 
   { 
     bsm_tab[index].bs_status = BSM_UNMAPPED;
@@ -31,7 +26,7 @@ SYSCALL init_bsm(){
       bsm_tab[index].bs_vpno[proc] = 4096;  // do -1 if not work
       proc+=1;
     }
-    //bsm_tab[index].bs_npages  = SETZERO;
+
     bsm_tab[index].bs_sem     = 0;
     bsm_tab[index].bs_private = 0;
     bsm_tab[index].bs_reference_cnt = 0;
@@ -54,7 +49,6 @@ SYSCALL get_bsm(int* avail)
   int index = 0;
   while (index < NBSM) 
   { 
-    //int checkStatus = bsm_tab[index].bs_status;
     if (bsm_tab[index].bs_status == 0) 
     {
       *avail = index;
@@ -93,7 +87,6 @@ SYSCALL free_bsm(int i)
      	 	bsm_tab[i].bs_vpno[proc] = 4096;  // do -1 if not work
       		proc+=1;
     	}
-    	//bsm_tab[index].bs_npages  = SETZERO;
         bsm_tab[i].bs_sem     = 0;
         bsm_tab[i].bs_private = 0;
         bsm_tab[i].bs_reference_cnt = 0;
@@ -114,17 +107,14 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth)
 {
 	STATWORD ps;
 	disable(ps);
- 
-  	//int index;// = 0;
+
  	unsigned long taddr = (vaddr&ANDVAL);
   	taddr = (taddr)>>12;
 	int stop_cond=-1;
 	int index;
 	for(index=0;index<NBSM;index++)
-  	//while (index < NBSM) 
   	{
-    		//int valid = bsm_tab[index].bs_pid[pid];
-    		if (bsm_tab[index].bs_pid[pid] ==1) 
+   		if (bsm_tab[index].bs_pid[pid] ==1) 
 		{
                 	int val1 = bsm_tab[index].bs_vpno[pid]+bsm_tab[index].bs_npages;
 			int val2 = bsm_tab[index].bs_vpno[pid];
@@ -132,11 +122,8 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth)
 			if(taddr < val1 && taddr >= val2)
 			{
       				*store = index;
-      				//int vpn = bsm_tab[index].bs_vpno[pid];
-      				*pageth = taddr - val2; // here change taddr to (vaddr/NBPG)
+     				*pageth = taddr - val2; // here change taddr to (vaddr/NBPG)
       				stop_cond=1;
-				//restore(ps);
-      				//return OK;
 			}
 			if (stop_cond==1)
 			{
@@ -144,8 +131,7 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth)
 				return OK;
 			}
     		}
-    		//index = index + SETONE;
-  	}
+ 	}
   	restore(ps);
   	return SYSERR;
 }
@@ -173,16 +159,15 @@ SYSCALL bsm_map(int pid, int vpno, int source, int npages)
 
         }
 
-  //	if (bsm_tab[source].bs_status==BSM_UNMAPPED) 
+//	if (bsm_tab[source].bs_status==BSM_UNMAPPED) 
 //	{
       		bsm_tab[source].bs_status = BSM_MAPPED;
       		bsm_tab[source].bs_npages = npages;
-  //	}
+//	}
   bsm_tab[source].bs_pid[pid] = 1;
   bsm_tab[source].bs_sem      = 0;
   bsm_tab[source].bs_vpno[pid]= vpno;
-  // int setVPN = vpno;
-  //int setSource = source;
+ 
   bsm_tab[source].bs_reference_cnt=1;
   bsm_tab[source].bs_mapping = 1;
   proctab[currpid].vhpno = vpno;
@@ -207,38 +192,27 @@ SYSCALL bsm_unmap(int pid, int vpno, int flag)
 		restore(ps);
 		return SYSERR;
 	}
-
- // 	int index = 0;
        	int bs_no = proctab[pid].store;
   	
   	int pageth;
-  	//unsigned long virtualAddress = vpno * 4096;
-  	bsm_tab[proctab[pid].store].bs_mapping = bsm_tab[proctab[pid].store].bs_mapping - 1;
+ 	bsm_tab[proctab[pid].store].bs_mapping = bsm_tab[proctab[pid].store].bs_mapping - 1;
   	int i;
 	unsigned long virt_addr = vpno*4096;
-	for(i=0;i<1024;++i)
-	//while (index < TWOTEN) 
-	{
-     	//	int checkPid = frm_tab[i].fr_pid;
-    	//	int checkTyp = frm_tab[i].fr_type;
-		
+	for(i=0;i<1024;++i) 
+	{	
 		if(frm_tab[i].fr_pid == pid)
-	    	//if (checkPid == pid && checkTyp == 0) 
 		{
 			if(frm_tab[i].fr_type == FR_PAGE)
 			{
        	 			if (bsm_lookup(pid, virt_addr, &bs_no, &pageth) != SYSERR) 
 				{
-          				//continue;
+         				//frm_tab[i].fr_refcnt-=1;
           				write_bs(((1024+i) * 4096), bs_no, pageth);
         			}
-        			//int twotenI = TWOTEN+i;
-        			//int mult = (1024+i) * 4096;
-        			//write_bs(((1024+i) * 4096), bs_no, pageth);
+	       			//write_bs(((1024+i) * 4096), bs_no, pageth);
 			}
     		}
-    		//index = index + SETONE;
-  	}
+ 	}
   	restore(ps);
   	return OK;
 }

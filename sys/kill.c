@@ -10,10 +10,6 @@
 #include <stdio.h>
 #include <paging.h>
 
-//#define SETZERO 0
-//#define SETONE  1
-//#define TWOTEN  1024
-
 /*------------------------------------------------------------------------
  * kill  --  kill a process and remove it from the system
  *------------------------------------------------------------------------
@@ -63,7 +59,6 @@ SYSCALL kill(int pid)
 	}
 	
 	// process kill so release bs for the same
-	//int persistStoreVal = proctab[pid].store;
 	release_bs(proctab[pid].store);
 
 	initiate_frame(pid);

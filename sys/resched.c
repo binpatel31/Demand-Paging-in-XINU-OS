@@ -22,10 +22,7 @@ int	resched()
 	register struct	pentry	*optr;	/* pointer to old process entry */
 	register struct	pentry	*nptr;	/* pointer to new process entry */
 	register int i;
-	//int store;
-	//int pageth;
-	//int hasToLookup;
-	//int oldProcessID;
+
 	
 
 	disable(PS);
@@ -90,19 +87,13 @@ int	resched()
 #endif
 
 	int ind,store,pageth;
-	//oldProcessID = ;
-	//i = SETZERO;
 	for(ind=0;ind<1024;ind++)
-	//while (ind < TWOTEN) {
 	{
-		//int checkPid = ;
-		//int checkTyp = ;
 		if (frm_tab[ind].fr_pid == (optr - proctab)) 
 		{
 			if(frm_tab[ind].fr_type == FR_PAGE)
 			{
 				long sz = (frm_tab[ind].fr_vpno * 4096);
-				//hasToLookup = ;
 				if (bsm_lookup((optr - proctab),sz,&store, &pageth) == SYSERR) 
 				{
 					continue;
@@ -110,32 +101,23 @@ int	resched()
 				write_bs(((ind + 1024)*4096), store, pageth);
 			}
 		}
-		//ind = ind + SETONE;
+
 	}
 
-	//ind = SETZERO;
 	for(ind=0;ind<1024;ind++)
-	//while (ind < TWOTEN) 
-	{
-		//int checkPIDNew = ;
-		//int checkTypeNew = ;
+	{ 
 		if (frm_tab[ind].fr_type == FR_PAGE) 
 		{
 			if(frm_tab[ind].fr_pid == currpid)
 			{
-				//int vpnoTolookup = frm_tab[ind].fr_vpno;
 				long vpnoTolookup = frm_tab[ind].fr_vpno * 4096;
-				//hasToLookup = bsm_lookup(currpid, vpnoTolookup, &store, &pageth);
 				if (bsm_lookup(currpid, vpnoTolookup, &store, &pageth) == SYSERR) 
 				{
 					continue;
 				}
-				//int frameInt = (ind + TWOTEN)* 4096;
-				// frameInt = frameInt * TWOTEN * 4;
 				read_bs(((ind + 1024)* 4096), store, pageth);
 			}
 		}
-		//ind = ind + SETONE;
 	}
 	
 	pdbr_init(currpid);

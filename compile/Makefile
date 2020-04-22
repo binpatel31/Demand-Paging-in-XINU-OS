@@ -371,28 +371,18 @@ monudp.o: ../mon/monudp.c /usr/include/stdc-predef.h \
  ../h/./mon/monbootp.h ../h/./mon/monarp.h ../h/./mon/monnetif.h \
  ../h/./mon/monitor.h ../h/./mon/moncom.h ../h/./mon/moni386.h \
  ../h/./mon/montftp.h ../h/stdio.h
-bsm_1.o: ../paging/bsm_1.c /usr/include/stdc-predef.h ../h/conf.h \
- ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
 bsm.o: ../paging/bsm.c /usr/include/stdc-predef.h ../h/conf.h \
- ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
-bsm_or.o: ../paging/bsm_or.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
 control_reg.o: ../paging/control_reg.c /usr/include/stdc-predef.h \
  ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h
 dump32.o: ../paging/dump32.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h
-frame1.o: ../paging/frame1.c /usr/include/stdc-predef.h ../h/conf.h \
- ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
-frame2.o: ../paging/frame2.c /usr/include/stdc-predef.h ../h/conf.h \
- ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
 frame.o: ../paging/frame.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
 get_bs.o: ../paging/get_bs.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
 pdbr_init.o: ../paging/pdbr_init.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
-pfint1.o: ../paging/pfint1.c /usr/include/stdc-predef.h ../h/conf.h \
- ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
 pfint.o: ../paging/pfint.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/paging.h ../h/proc.h
 policy.o: ../paging/policy.c /usr/include/stdc-predef.h ../h/conf.h \
@@ -403,18 +393,11 @@ read_bs.o: ../paging/read_bs.c /usr/include/stdc-predef.h ../h/conf.h \
 release_bs.o: ../paging/release_bs.c /usr/include/stdc-predef.h \
  ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
  ../h/paging.h
-vcreate1.o: ../paging/vcreate1.c /usr/include/stdc-predef.h ../h/conf.h \
- ../h/i386.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
- ../h/sem.h ../h/io.h ../h/paging.h
 vcreate.o: ../paging/vcreate.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/i386.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h \
  ../h/sem.h ../h/io.h ../h/paging.h
-vfreemem_1.o: ../paging/vfreemem_1.c /usr/include/stdc-predef.h \
- ../h/conf.h ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
 vfreemem.o: ../paging/vfreemem.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h
-vgetmem_1.o: ../paging/vgetmem_1.c /usr/include/stdc-predef.h ../h/conf.h \
- ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
 vgetmem.o: ../paging/vgetmem.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/paging.h
 write_bs.o: ../paging/write_bs.c /usr/include/stdc-predef.h ../h/conf.h \
@@ -521,9 +504,6 @@ recvclr.o: ../sys/recvclr.c /usr/include/stdc-predef.h ../h/conf.h \
 recvtim.o: ../sys/recvtim.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/q.h \
  ../h/sleep.h ../h/stdio.h
-resched_1.o: ../sys/resched_1.c /usr/include/stdc-predef.h ../h/conf.h \
- ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/q.h \
- ../h/paging.h
 resched.o: ../sys/resched.c /usr/include/stdc-predef.h ../h/conf.h \
  ../h/kernel.h ../h/systypes.h ../h/mem.h ../h/proc.h ../h/q.h \
  ../h/paging.h

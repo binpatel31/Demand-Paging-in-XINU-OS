@@ -25,8 +25,7 @@ SYSCALL release_bs(bsd_t bs_id)
 	bsm_tab[bs_id].bs_pid[currpid]  = 0;
     	bsm_tab[bs_id].bs_vpno[currpid] = 4096;
 
-    	//int checkMapping = bsm_tab[bs_id].bs_mapping;
-    	if (bsm_tab[bs_id].bs_mapping == 0) 
+   	if (bsm_tab[bs_id].bs_mapping == 0) 
 	{
       		bsm_tab[bs_id].bs_status = BSM_UNMAPPED;
       		bsm_tab[bs_id].bs_sem    = 0;

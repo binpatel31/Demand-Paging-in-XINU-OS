@@ -11,10 +11,6 @@
 
 LOCAL int newpid();
 
-#define SETONE  1
-#define SETZERO 0
-#define TWOTEN  1024
-
 //============================================
 void createPageDir(int pid)
 {

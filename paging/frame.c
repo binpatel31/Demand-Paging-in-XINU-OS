@@ -60,14 +60,14 @@ SYSCALL get_frm(int* avail)
     		}
   	}
 	
-  	int frameNumber;
+  	int FN;
   	if (page_replace_policy == SC) 
 	{
-    		frameNumber = getFrameSC();
-    		free_frm(frameNumber);
+    		FN = getFrameSC();
+    		free_frm(FN);
    		
-		scAcc[frameNumber] = 1;
-    		*avail = frameNumber;
+			scAcc[FN] = 1;
+    		*avail = FN;
     		restore(ps);
     		return OK;
   	}
@@ -105,58 +105,59 @@ SYSCALL free_frm(int i)
 {
   	STATWORD ps;
   	disable(ps);
-  	int pageNumber,index,frameID,storeID;
+  	int PN,index,frameID,storeID;
 
-  	unsigned long virtualAddress,pdbr;
-  	unsigned int pageTable,pageDirectory;
+  	unsigned long virt_addr,pdbr;
+  	unsigned int PT,PD;
 
-    	pd_t *pd_entry;
+    pd_t *pd_entry;
 	int shift;
   	pt_t *pt_entry;
 
   	index = i;
-  	int checkType = frm_tab[index].fr_type;
+  	//int checkType = frm_tab[index].fr_type;
 	int temp_vpno,temp_pid,temp_pdbr;
   	if (frm_tab[index].fr_type == FR_PAGE) 
 	{
-		int proctabStore;
-	    	temp_vpno = frm_tab[index].fr_vpno;
-    		temp_pid = frm_tab[index].fr_pid;
-		frameID = temp_pid;
-		temp_pdbr = proctab[frameID].pdbr;
-		int get_store = proctab[temp_pid].store;
-		virtualAddress = temp_vpno;
+        int  p_bs;
+        temp_vpno = frm_tab[index].fr_vpno;
+    	temp_pid = frm_tab[index].fr_pid;
+	frameID = temp_pid;
+	temp_pdbr = proctab[frameID].pdbr;
+	int get_store = proctab[temp_pid].store;
+	virt_addr = temp_vpno;
     		
-    		pdbr = temp_pdbr;
+    	pdbr = temp_pdbr;
     		
-		int and = 1024 - 1;
-		int inHex = 0x003ff000;
-    		pageTable = virtualAddress & 1023;
-    		shift = 10;
-    		pageDirectory = virtualAddress>>10;
-    		proctabStore = get_store;
-    		storeID = proctabStore;
+	int and = 1024 - 1;
+	int inHex = 0x003ff000;
+    	PT = virt_addr & 1023;
+    	shift = 10;
+    	PD = virt_addr>>10;
+    	p_bs = get_store;
+    	storeID = p_bs;
 
-    		pd_entry =  pdbr + (pageDirectory*sizeof(pd_t));
+    	pd_entry =  pdbr + (PD*sizeof(pd_t));
 			
 		int temp_vpno_2 = frm_tab[index].fr_vpno;
    
-    		pt_entry =  ((sizeof(pt_t)*pageTable)+ (4096*(pd_entry->pd_base)));
-    		int virt_heap_proc;
+    	pt_entry =  ((sizeof(pt_t)*PT)+ (4096*(pd_entry->pd_base)));
+    	int virt_heap_proc;
 		virt_heap_proc = proctab[frameID].vhpno;
     		
-    		pageNumber = frm_tab[index].fr_vpno - proctab[frameID].vhpno;
+    	PN = frm_tab[index].fr_vpno - proctab[frameID].vhpno;
 
-    		write_bs((index+1024)*4096, storeID, pageNumber);
+    	write_bs((index+1024)*4096, storeID, PN);
 		int f = pd_entry->pd_base;
-    		pt_entry->pt_pres = 0;
-    		int frameIndex =  f - 1024;
+    	pt_entry->pt_pres = 0;
+    	int frameIndex =  f - 1024;
 		frm_tab[frameIndex].fr_refcnt-=1;
-    		if ((frm_tab[frameIndex].fr_refcnt) == 0) 
+    	
+    	if ((frm_tab[frameIndex].fr_refcnt) == 0) 
 		{
       			frm_tab[frameIndex].fr_pid    = -1;
-			//untrack
-			fr_pid_track[frameIndex][currpid]=0;		
+			    //untrack
+				fr_pid_track[frameIndex][currpid]=0;		
       			frm_tab[frameIndex].fr_status = FRM_UNMAPPED;
       			frm_tab[frameIndex].fr_vpno   = 4096;
       			frm_tab[frameIndex].fr_type   = FR_PAGE;

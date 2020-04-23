@@ -4,11 +4,7 @@
 #include <proc.h>
 #include <paging.h>
 
-#define SETZERO 0
-#define SETONE  1
-#define TWOTEN  1024
 extern int page_replace_policy;
-
 
 /*-------------------------------------------------------------------------
  * init_frm - initialize frm_tab
@@ -18,20 +14,24 @@ SYSCALL init_frm()
 {
 	STATWORD ps;
   	disable(ps);
-
-  	int index = SETZERO;
-  	while (index < TWOTEN) 
+	
+  	int i;
+	for(i=0;i<NFRAMES;i++) 
 	{
-    		frm_tab[index].fr_status  = 0;
-    		frm_tab[index].fr_pid     = -1;
-    		frm_tab[index].fr_vpno    = 0;
-    		frm_tab[index].fr_refcnt  = SETZERO;
-    		frm_tab[index].fr_type    = 0;
-    		frm_tab[index].fr_dirty   = SETZERO;
-
-    		scAcc[index]  = SETZERO;
-    		scPointer   = SETZERO;
-    		index = index + SETONE;
+    		frm_tab[i].fr_status  = 0;
+    		frm_tab[i].fr_pid     = -1;
+    		frm_tab[i].fr_vpno    = 0;
+    		int p;
+			for(p=0;p<NPROC;p++)
+			{
+				fr_pid_track[i][p]=-1;
+			}
+		frm_tab[i].fr_refcnt  = 0;
+    		frm_tab[i].fr_type    = 0;
+    		frm_tab[i].fr_dirty   = 0;
+			
+    		scAcc[i]  = 0;
+    		scPointer   = 0;
   	}
   	restore(ps);
   	return OK;
@@ -46,31 +46,27 @@ SYSCALL get_frm(int* avail)
   	STATWORD ps;
   	disable(ps);
 
-  	int index = SETZERO;
-  	*avail    = -SETONE;
+  	int i;
 
-  	int frameNumber;
-
-  	while (index < TWOTEN) 
+	for(i=0;i<NFRAMES;i++) 
 	{
-    		int checkStatus = frm_tab[index].fr_status;
-    
-    		if (checkStatus == 0) 
+    		if (frm_tab[i].fr_status == FRM_UNMAPPED) 
 		{
-      			//kprintf("IN");
-      			*avail = index;
-      			scAcc[index] = SETONE;
+      			scAcc[i] = 1;
+			fr_pid_track[i][currpid]=1;
+			*avail = i;
       			restore(ps);
       			return OK;
     		}
-    		index = index + SETONE;
   	}
-  	
-  	if (page_replace_policy == 3) 
+	
+  	int frameNumber;
+  	if (page_replace_policy == SC) 
 	{
     		frameNumber = getFrameSC();
     		free_frm(frameNumber);
-    		scAcc[frameNumber] = SETONE;
+   		
+		scAcc[frameNumber] = 1;
     		*avail = frameNumber;
     		restore(ps);
     		return OK;
@@ -82,12 +78,12 @@ SYSCALL get_frm(int* avail)
     		int min_frame=-1;
     		for(fr=0;fr<NFRAMES;++fr)
     		{
-        		if(frm_tab[fr].fr_type == FR_PAGE && frm_tab[fr].fr_cnt<min)
+        		if(frm_tab[fr].fr_type == FR_PAGE && frm_tab[fr].fr_refcnt<min)
         		{
-               			min = frm_tab[fr].fr_cnt;
+               			min = frm_tab[fr].fr_refcnt;
                 		min_frame=fr;
         		}
-			else if(frm_tab[fr].fr_cnt == min && (frm_tab[fr].fr_vpno > frm_tab[min_frame].fr_vpno))
+			else if(frm_tab[fr].fr_refcnt == min && (frm_tab[fr].fr_vpno > frm_tab[min_frame].fr_vpno))
 			{
 				min_frame=fr;
 			}
@@ -107,81 +103,65 @@ SYSCALL get_frm(int* avail)
  */
 SYSCALL free_frm(int i)
 {
-
   	STATWORD ps;
   	disable(ps);
-  	int pageNumber;
-  	int index;
-  	int frameID;
-  	int storeID;
-  	int checkType;
-  	unsigned long virtualAddress;
-  	unsigned int pageTable;
-  	unsigned int pageDirectory;
-  	unsigned long pdbr;
-  	pd_t *pd_entry;
+  	int pageNumber,index,frameID,storeID;
+
+  	unsigned long virtualAddress,pdbr;
+  	unsigned int pageTable,pageDirectory;
+
+    	pd_t *pd_entry;
+	int shift;
   	pt_t *pt_entry;
 
   	index = i;
-  	checkType = frm_tab[index].fr_type;
-
-  	if (checkType == 0) 
+  	int checkType = frm_tab[index].fr_type;
+	int temp_vpno,temp_pid,temp_pdbr;
+  	if (frm_tab[index].fr_type == FR_PAGE) 
 	{
-	    	int v_p_n_o = frm_tab[index].fr_vpno;
-    		virtualAddress = v_p_n_o;
-
-    		int p_i_d = frm_tab[index].fr_pid;
-    		frameID = p_i_d;
-
-    		int p_d_b_r = proctab[frameID].pdbr;
-    		pdbr = p_d_b_r;
-
-    		int andVal = TWOTEN - 1;
-    		pageTable = virtualAddress & andVal;
-
-    		int shiftVal = SETONE * 10;
-    		pageDirectory = virtualAddress>>shiftVal;
-
-    		int proctabStore = proctab[frameID].store;
+		int proctabStore;
+	    	temp_vpno = frm_tab[index].fr_vpno;
+    		temp_pid = frm_tab[index].fr_pid;
+		frameID = temp_pid;
+		temp_pdbr = proctab[frameID].pdbr;
+		int get_store = proctab[temp_pid].store;
+		virtualAddress = temp_vpno;
+    		
+    		pdbr = temp_pdbr;
+    		
+		int and = 1024 - 1;
+		int inHex = 0x003ff000;
+    		pageTable = virtualAddress & 1023;
+    		shift = 10;
+    		pageDirectory = virtualAddress>>10;
+    		proctabStore = get_store;
     		storeID = proctabStore;
 
-    		int a = sizeof(pd_t);
-    		int b = pageDirectory;
-    		int mult = b * a;
-    		int c = pdbr;
-    		int add = c + mult;
-    		pd_entry = add;
+    		pd_entry =  pdbr + (pageDirectory*sizeof(pd_t));
+			
+		int temp_vpno_2 = frm_tab[index].fr_vpno;
+   
+    		pt_entry =  ((sizeof(pt_t)*pageTable)+ (4096*(pd_entry->pd_base)));
+    		int virt_heap_proc;
+		virt_heap_proc = proctab[frameID].vhpno;
+    		
+    		pageNumber = frm_tab[index].fr_vpno - proctab[frameID].vhpno;
 
-    		int d = sizeof(pt_t);
-    		int e = pageTable;
-    		int multTwo = d * e;
-    		int twoFourTen = TWOTEN * 4;
-    		int f = pd_entry->pd_base;
-    		int multThree = twoFourTen * f;
-    		int addTwo = multTwo + multThree;
-    		pt_entry = addTwo;
-
-    		int proctabVh = proctab[frameID].vhpno;
-    		int v_p_n_o_dos = frm_tab[index].fr_vpno;
-    		pageNumber = v_p_n_o_dos - proctabVh;
-
-    		int indexFrame = index + TWOTEN;
-    		indexFrame = indexFrame * twoFourTen;
-    		write_bs(indexFrame, storeID, pageNumber);
-
-    		pt_entry->pt_pres = SETZERO;
-    		int frameIndex = f - TWOTEN;
-
-    		if ((frm_tab[frameIndex].fr_refcnt - 1) == SETZERO) 
+    		write_bs((index+1024)*4096, storeID, pageNumber);
+		int f = pd_entry->pd_base;
+    		pt_entry->pt_pres = 0;
+    		int frameIndex =  f - 1024;
+		frm_tab[frameIndex].fr_refcnt-=1;
+    		if ((frm_tab[frameIndex].fr_refcnt) == 0) 
 		{
-      			frm_tab[frameIndex].fr_pid    = -SETONE;
-      			frm_tab[frameIndex].fr_status = 0;
-      			frm_tab[frameIndex].fr_vpno   = TWOTEN * 4;
-      			frm_tab[frameIndex].fr_type   = 0;
+      			frm_tab[frameIndex].fr_pid    = -1;
+			//untrack
+			fr_pid_track[frameIndex][currpid]=0;		
+      			frm_tab[frameIndex].fr_status = FRM_UNMAPPED;
+      			frm_tab[frameIndex].fr_vpno   = 4096;
+      			frm_tab[frameIndex].fr_type   = FR_PAGE;
     		}
-
    	}
-
    	restore(ps);
   	return OK;
 }
@@ -190,55 +170,66 @@ int getFrameSC()
 {
 	STATWORD ps;
   	disable(ps);
-  	int index = SETZERO;
-  	index = index + scPointer;
+  	int i = scPointer;
 
-  	while(SETONE) 
+  	for(i=scPointer;;i++)
 	{
-    		index = index % TWOTEN;
-    		int checkType = frm_tab[index].fr_type;
-    		if (checkType == 0) 
+    		i = i % 1024;
+     		if (frm_tab[i].fr_type == FR_PAGE) 
 		{
-      			int checkSCValue = scAcc[index];
-      			if (checkSCValue == SETONE) 
+			if (scAcc[i] != 1)
 			{
-        			int updateSCVAL = SETZERO;
-        			scAcc[index] = updateSCVAL;
-      			} 
-			else 
-			{
-        			scPointer = index + SETONE;
+				scPointer = i + 1;
         			restore (ps);
-        			return index;
-      			}
+        			return i;
+			}
+			else
+			{
+				scAcc[i]=0;
+			}
     		}
-    		index = index + SETONE;
   	}
 
   	restore(ps);
   	return SYSERR;
 }
 
-void frameDefine(int pid) 
+void initiate_frame(int pid) 
 {
 	STATWORD ps;
 	disable(ps);
-	int index = SETZERO;
-
-	while (index < TWOTEN) 
+	int i;
+	for(i=0;i<NFRAMES;i++) 
 	{
-    		int checkP_i_d = frm_tab[index].fr_pid;
-  		if (checkP_i_d != pid) 
+  		if (frm_tab[i].fr_pid == pid) 
 		{
-    			continue;
+    			frm_tab[i].fr_status= FRM_UNMAPPED;
+				frm_tab[i].fr_pid= -1;
+				//untrack
+				fr_pid_track[i][pid]=0;
+				
+				frm_tab[i].fr_vpno= 4096;
+				frm_tab[i].fr_refcnt= 0;
+				//which pid in i is current active
+				int test_1;
+				int debug=0;
+				for (debug=0;debug<NPROC;debug++)
+				{
+					if (fr_pid_track[i][pid]=1)
+					{
+						test_1=pid;
+						break;
+						
+					}
+				}
+				//kprintf("%d",test_1);		
+				frm_tab[i].fr_type= FR_PAGE;
+				frm_tab[i].fr_dirty	= 0;
   		}
-  		frm_tab[index].fr_status= 0;
-  		frm_tab[index].fr_pid= -SETONE;
-  		frm_tab[index].fr_vpno= TWOTEN * 4;
-  		frm_tab[index].fr_refcnt= SETZERO;
-  		frm_tab[index].fr_type= 0;
-  		frm_tab[index].fr_dirty	= SETZERO;
-  		index = index + SETONE;
+		else
+		{
+			continue;
+		}
 	}
 	restore(ps);
 }

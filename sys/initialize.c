@@ -49,10 +49,11 @@ int	reboot = 0;		/* non-zero after first boot		*/
 int lfu_cnt[1024];
 int scAcc[1024];
 
-int	rdyhead,rdytail;	/* head/tail of ready list (q indicies)	*/
+int	rdyhead;	
 char 	vers[80];
 int	console_dev;		/* the console device			*/
 int scPointer;
+int rdytail;
 
 int page_replace_policy = SC;
 int fr_pid_track[NFRAMES][NPROC];

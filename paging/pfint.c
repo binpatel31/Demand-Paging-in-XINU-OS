@@ -74,7 +74,7 @@ SYSCALL pfint()
 	  int new_PT; 
 	  if (pd_entry->pd_pres == 0)
 	  {
-		    new_PT = pageCreate();
+	         	new_PT = pageCreate();
 			pd_entry->pd_acc    = 0;
 			pd_entry->pd_mbz    = 0;
 			pd_entry->pd_fmb    = 0;
@@ -91,7 +91,12 @@ SYSCALL pfint()
 			pd_entry->pd_base = 1024 + new_PT;
 
 			frm_tab[new_PT].fr_status = FRM_MAPPED;
-			frm_tab[new_PT].fr_refcnt = 0;
+			if(frm_tab[new_PT].fr_refcnt<0)
+			{
+				frm_tab[new_PT].fr_refcnt=0;
+			}
+			frm_tab[new_PT].fr_refcnt+=1;
+			//frm_tab[new_PT].fr_refcnt = 0;
 			frm_tab[new_PT].fr_type   = FR_TBL;
 			int base = 1024 + new_PT;
 			frm_tab[new_PT].fr_pid    = currpid;
@@ -111,6 +116,11 @@ SYSCALL pfint()
 			pt_entry->pt_write  = 1;
 	
 			int passVal = (1024 + newFrame) * 4096;
+
+                        if(frm_tab[sub].fr_refcnt<0)
+                        {
+                                frm_tab[sub].fr_refcnt=0;
+                        }			
 			frm_tab[sub].fr_refcnt+= 1;
 			int ins_vpno = virtualAddress/4096;
 			frm_tab[newFrame].fr_status = FRM_MAPPED;
@@ -123,6 +133,7 @@ SYSCALL pfint()
 
 			bsm_lookup(currpid, virtualAddress, &store, &pageth);
 			
+//			kprintf("=======&&&&& %d",frm_tab[sub].fr_refcnt);			
 			read_bs((char *)((1024 + newFrame) * 4096), store, pageth);
     }
 
